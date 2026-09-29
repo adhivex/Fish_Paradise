@@ -1,0 +1,2 @@
+Run `pnpm lint && pnpm typecheck && pnpm test && pnpm build`. Then run the Playwright suite. Check `.env.example` is complete, no secrets are committed, migrations apply cleanly on an empty database, and the seed is not run in production config.
+Walk through `docs/LAUNCH_CHECKLIST.md` (create it from `prompts/phases.md` Phase 10 if missing) and report which items are done, which are placeholders, and which need input from the shop owner.

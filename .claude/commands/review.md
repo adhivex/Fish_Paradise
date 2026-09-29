@@ -1,0 +1,2 @@
+Review the current uncommitted changes and the last commit against `CLAUDE.md` rules: money in paise, grams for weight, server-side pricing, order snapshots, webhook-only payment confirmation, single `transitionOrder` path, admin authorisation, accessibility (44px targets, aria-labels, contrast), and mobile layout at 390px.
+List findings by severity with file and line, then fix the high and medium ones and re-run lint, typecheck and tests.

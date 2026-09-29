@@ -1,0 +1,372 @@
+// Fish Paradise – database schema
+// Money = integer paise. Weight = integer grams.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  // Supabase: DATABASE_URL = pooled (port 6543, ?pgbouncer=true) for the app,
+  // DIRECT_URL = direct/session connection (port 5432) for migrations.
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum OrderStatus {
+  PLACED
+  CONFIRMED
+  CLEANING_PACKING
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  UPI
+  CARD
+  NETBANKING
+  COD
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUND_PENDING
+  REFUNDED
+  COD_PENDING
+  COD_COLLECTED
+}
+
+enum SlotType {
+  ASAP
+  SCHEDULED
+}
+
+enum CouponType {
+  PERCENT
+  FLAT
+}
+
+model User {
+  id        String    @id @default(cuid())
+  phone     String    @unique // E.164, e.g. +919876543210
+  name      String?
+  email     String?
+  role      Role      @default(CUSTOMER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  addresses Address[]
+  cart      Cart?
+  orders    Order[]
+  favorites Favorite[]
+  couponUses CouponUse[]
+}
+
+model OtpCode {
+  id         String    @id @default(cuid())
+  phone      String
+  codeHash   String
+  expiresAt  DateTime
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([phone, createdAt])
+}
+
+model Address {
+  id        String   @id @default(cuid())
+  userId    String
+  label     String   @default("Home") // Home, Work, Other
+  line1     String
+  line2     String?
+  landmark  String?
+  area      String?
+  city      String
+  state     String   @default("Odisha")
+  pincode   String
+  lat       Float?
+  lng       Float?
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  name      String
+  imageUrl  String?
+  sortOrder Int       @default(0)
+  isActive  Boolean   @default(true)
+  products  Product[]
+}
+
+model Product {
+  id                String   @id @default(cuid())
+  slug              String   @unique
+  name             String
+  categoryId       String
+  description      String?
+  note             String? // short tag e.g. "Freshly sourced today"
+  imageUrl         String?
+  pricePerKgPaise  Int
+  minQtyGrams      Int      @default(500)
+  stepGrams        Int      @default(500)
+  maxQtyGrams      Int      @default(20000)
+  todayAvailable   Boolean  @default(true)
+  stockGrams       Int? // null = not tracked
+  isFeatured       Boolean  @default(false) // shows in "Today's fresh catch"
+  isActive         Boolean  @default(true)
+  sortOrder        Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  category     Category       @relation(fields: [categoryId], references: [id])
+  priceHistory ProductPrice[]
+  cartItems    CartItem[]
+  orderItems   OrderItem[]
+  favorites    Favorite[]
+
+  @@index([categoryId, isActive])
+}
+
+model ProductPrice {
+  id              String   @id @default(cuid())
+  productId       String
+  pricePerKgPaise Int
+  effectiveFrom   DateTime @default(now())
+  setById         String?
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, effectiveFrom])
+}
+
+model CleaningOption {
+  id            String  @id @default(cuid())
+  label         String  @unique // Whole cleaned, Curry cut, Fry cut, Custom cut
+  requiresNote  Boolean @default(false)
+  extraPaise    Int     @default(0)
+  isDefault     Boolean @default(false)
+  isActive      Boolean @default(true)
+  sortOrder     Int     @default(0)
+
+  cartItems CartItem[]
+}
+
+model Favorite {
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([userId, productId])
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  notes     String?
+  couponCode String?
+  updatedAt DateTime   @updatedAt
+
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items CartItem[]
+}
+
+model CartItem {
+  id               String @id @default(cuid())
+  cartId           String
+  productId        String
+  qtyGrams         Int
+  cleaningOptionId String
+  lineNote         String?
+
+  cart           Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product        Product        @relation(fields: [productId], references: [id])
+  cleaningOption CleaningOption @relation(fields: [cleaningOptionId], references: [id])
+
+  @@unique([cartId, productId])
+}
+
+model DeliveryZone {
+  id                  String  @id @default(cuid())
+  pincode             String  @unique
+  areaName            String
+  deliveryFeePaise    Int     @default(4000)
+  freeAbovePaise      Int? // null = never free
+  minOrderPaise       Int     @default(0)
+  isActive            Boolean @default(true)
+}
+
+model SlotTemplate {
+  id        String  @id @default(cuid())
+  label     String // "5:00 – 6:00 PM"
+  startTime String // "17:00" (shop local time)
+  endTime   String // "18:00"
+  capacity  Int     @default(20) // max scheduled orders per day
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0)
+}
+
+model Coupon {
+  id                 String     @id @default(cuid())
+  code               String     @unique
+  description        String?
+  type               CouponType
+  value              Int // percent (1-100) or flat paise
+  minSubtotalPaise   Int        @default(0)
+  maxDiscountPaise   Int?
+  startsAt           DateTime?
+  endsAt             DateTime?
+  totalUsageLimit    Int?
+  perUserLimit       Int?
+  usedCount          Int        @default(0)
+  isActive           Boolean    @default(true)
+
+  orders Order[]
+  uses   CouponUse[]
+}
+
+model CouponUse {
+  id        String   @id @default(cuid())
+  couponId  String
+  userId    String
+  orderId   String   @unique
+  usedAt    DateTime @default(now())
+
+  coupon Coupon @relation(fields: [couponId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+  order  Order  @relation(fields: [orderId], references: [id])
+
+  @@index([couponId, userId])
+}
+
+model Order {
+  id              String        @id @default(cuid())
+  seq             Int           @unique @default(autoincrement())
+  orderNumber     String        @unique // "FP" + (1000 + seq), set on create
+  userId          String
+  status          OrderStatus   @default(PLACED)
+  addressSnapshot Json
+  slotType        SlotType
+  slotStart       DateTime?
+  slotEnd         DateTime?
+  etaMinMinutes   Int?
+  etaMaxMinutes   Int?
+  subtotalPaise   Int
+  deliveryFeePaise Int
+  discountPaise   Int           @default(0)
+  totalPaise      Int
+  couponId        String?
+  notes           String?
+  paymentMethod   PaymentMethod
+  paymentStatus   PaymentStatus @default(PENDING)
+  cancelReason    String?
+  placedAt        DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  user    User        @relation(fields: [userId], references: [id])
+  coupon  Coupon?     @relation(fields: [couponId], references: [id])
+  items   OrderItem[]
+  events  OrderEvent[]
+  payments Payment[]
+  couponUse CouponUse?
+
+  @@index([userId, placedAt])
+  @@index([status, placedAt])
+}
+
+model OrderItem {
+  id               String @id @default(cuid())
+  orderId          String
+  productId        String
+  nameSnapshot     String
+  pricePerKgPaise  Int
+  qtyGrams         Int
+  cleaningLabel    String
+  lineNote         String?
+  lineTotalPaise   Int
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+}
+
+model OrderEvent {
+  id        String       @id @default(cuid())
+  orderId   String
+  status    OrderStatus
+  note      String?
+  actorId   String? // admin user id, null = system/customer
+  createdAt DateTime     @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, createdAt])
+}
+
+model Payment {
+  id                 String        @id @default(cuid())
+  orderId            String
+  provider           String        @default("razorpay")
+  razorpayOrderId    String?       @unique
+  razorpayPaymentId  String?       @unique
+  amountPaise        Int
+  status             PaymentStatus @default(PENDING)
+  method             PaymentMethod?
+  failureReason      String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@index([orderId])
+}
+
+// Idempotency for provider webhooks
+model WebhookEvent {
+  id         String   @id @default(cuid())
+  provider   String
+  eventId    String
+  type       String
+  payload    Json
+  processedAt DateTime?
+  createdAt  DateTime @default(now())
+
+  @@unique([provider, eventId])
+}
+
+// Single row (id = "shop")
+model ShopSettings {
+  id                     String  @id @default("shop")
+  shopName               String  @default("Fish Paradise")
+  phone                  String?
+  whatsapp               String?
+  fssaiNumber            String?
+  gstin                  String?
+  opensAt                String  @default("07:00")
+  closesAt               String  @default("20:00")
+  acceptingOrders        Boolean @default(true)
+  asapMinMinutes         Int     @default(30)
+  asapMaxMinutes         Int     @default(60)
+  autoConfirmCod         Boolean @default(true)
+  unpaidCancelMinutes    Int     @default(30)
+  priceBandsPaise        Json? // e.g. [30000, 60000]
+}

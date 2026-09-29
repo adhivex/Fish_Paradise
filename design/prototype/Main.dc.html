@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Fish Paradise</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&amp;family=DM+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0A2A2F;--ink2:#4F6A6C;--cream:#F7F2E8;--card:#FFFCF6;--line:#E6DCC8;--gold:#C9A45C;--gd:#7A5C22;--gsoft:#F1E7D0}
+body{margin:0;background:#F7F2E8;font-family:'DM Sans',system-ui,sans-serif;color:#0A2A2F}
+.app{position:relative;width:390px;height:844px;overflow:hidden;background:#F7F2E8;color:#0A2A2F;font-size:15px;letter-spacing:.005em}
+.app *{box-sizing:border-box}
+.app button{font-family:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;background:#F7F2E8}
+.sc{flex:1 1 0;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+.serif{font-family:'Fraunces',Georgia,serif}
+svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+svg.i.fav{fill:#B08A45;stroke:#B08A45}
+.ib{width:44px;height:44px;border-radius:50%;border:0;background:transparent;display:flex;align-items:center;justify-content:center;flex:none;position:relative}
+.badge{position:absolute;top:3px;right:1px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#C9A45C;color:#0A2A2F;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.hd{display:flex;align-items:center;gap:4px;padding:12px 12px 8px;flex:none}
+.hd h1{margin:0;font-size:24px;font-weight:600;flex:1;letter-spacing:-.3px}
+.tile{border-radius:18px;display:flex;align-items:center;justify-content:center;flex:none}
+.tile .g{width:70%;height:auto}
+.t72{width:76px;height:76px}.t56{width:56px;height:56px;border-radius:14px}.t44{width:44px;height:44px;border-radius:12px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 16px 14px;flex:none}
+.chip{flex:none;height:44px;padding:0 20px;border-radius:22px;border:1px solid #D9CCB1;background:transparent;font-size:14px;font-weight:600;color:#0A2A2F;letter-spacing:.01em}
+.chip.on{background:#0A2A2F;border-color:#0A2A2F;color:#F7F2E8}
+.cta{margin:0 16px;width:calc(100% - 32px);height:56px;border-radius:16px;border:0;background:#0A2A2F;color:#F7F2E8;font-size:15px;font-weight:600;letter-spacing:.03em;display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none}
+.cta svg{color:#C9A45C}
+.cta.ink{background:#0A2A2F}
+.cta.out{background:transparent;border:1px solid #0A2A2F;color:#0A2A2F}
+.cta.out svg{color:#0A2A2F}
+.dock{padding:14px 0 18px;background:#F7F2E8;border-top:1px solid #E6DCC8;flex:none}
+.card{background:#FFFCF6;border:1px solid #E6DCC8;border-radius:20px;box-shadow:0 14px 30px -22px rgba(10,42,47,.45)}
+.add{width:44px;height:44px;border-radius:50%;border:0;background:#0A2A2F;color:#C9A45C;display:flex;align-items:center;justify-content:center;flex:none}
+.nav{position:absolute;left:0;right:0;bottom:0;display:flex;background:#FFFCF6;border-top:1px solid #E6DCC8;padding:6px 8px 14px;z-index:5}
+.nb{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:600;min-height:54px;color:#5E7476;letter-spacing:.02em}
+.nb.on{color:#0A2A2F}
+.nb.on svg{color:#7A5C22}
+.nb.on:after{content:'';width:4px;height:4px;border-radius:50%;background:#C9A45C;margin-top:1px}
+.toast{position:absolute;left:16px;right:16px;bottom:96px;z-index:6;background:#0A2A2F;color:#F7F2E8;border-radius:16px;padding:6px 6px 6px 16px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;box-shadow:0 18px 30px -14px rgba(10,42,47,.6)}
+.toast svg{color:#C9A45C}
+.toast button{margin-left:auto;height:44px;padding:0 16px;border:0;border-radius:12px;background:#C9A45C;color:#0A2A2F;font-weight:700;font-size:14px}
+.hero{position:relative;background:#0A2A2F;color:#F7F2E8;padding:6px 0 60px;border-radius:0 0 34px 34px;overflow:hidden}
+.waves{position:absolute;left:0;top:0;width:100%;height:100%}
+.hfish{position:absolute;right:-70px;bottom:44px;width:270px;transform:rotate(-12deg)}
+.hz{position:relative;z-index:1}
+.brand{display:flex;align-items:center;gap:10px;flex:1;font-size:20px;font-weight:600;letter-spacing:-.2px}
+.mark{width:34px;height:34px;border-radius:50%;background:#C9A45C;display:flex;align-items:center;justify-content:center}
+.mark svg{width:20px;height:auto}
+.loc{margin:4px 16px 0;height:44px;padding:0 16px;border-radius:22px;border:1px solid rgba(201,164,92,.45);background:transparent;color:#F7F2E8;display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:500}
+.loc svg{color:#C9A45C}
+.eyebrow{margin:28px 16px 0;font-size:12px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#C9A45C}
+.hh{margin:10px 16px 12px;font-size:42px;line-height:1.04;font-weight:600;letter-spacing:-1px}
+.hs{margin:0 16px 26px;font-size:14px;line-height:1.6;color:rgba(247,242,232,.8);max-width:240px}
+.cta.hcta{margin:0 16px;width:auto;display:inline-flex;padding:0 28px;height:52px;background:#C9A45C;color:#0A2A2F;border-radius:26px}
+.cta.hcta svg{color:#0A2A2F}
+.feat{position:relative;z-index:2;margin:-32px 16px 0;padding:16px 4px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
+.fi{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;font-size:12px;font-weight:600;line-height:1.25;padding:0 4px}
+.fi+.fi{border-left:1px solid #EFE6D3}
+.fc{width:46px;height:46px;border-radius:50%;background:transparent;border:1px solid #C9A45C;color:#0A2A2F;display:flex;align-items:center;justify-content:center}
+.sh{display:flex;align-items:flex-end;justify-content:space-between;margin:30px 16px 12px}
+.sh h2{margin:0;font-size:24px;font-weight:600;letter-spacing:-.4px}
+.lnk{border:0;background:none;color:#7A5C22;font-size:14px;font-weight:700;height:44px;padding:0 4px;display:flex;align-items:center;gap:2px;letter-spacing:.02em}
+.cats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:0 16px}
+.cat{border:0;background:transparent;border-radius:20px;padding:0;display:flex;flex-direction:column;align-items:center;gap:10px;font-size:14px;font-weight:600;letter-spacing:.02em}
+.cat .tile{width:100%;height:92px;border-radius:20px}
+.hs2{display:flex;gap:12px;overflow-x:auto;padding:0 16px 8px}
+.pc{position:relative;width:164px;flex:none;background:#FFFCF6;border:1px solid #E6DCC8;border-radius:22px;padding:8px;box-shadow:0 14px 30px -22px rgba(10,42,47,.45)}
+.pcm{display:block;width:100%;border:0;background:none;padding:0;text-align:left}
+.pcm .tile{width:100%;height:116px;border-radius:16px}
+.pcm .n{display:block;margin:12px 52px 0 6px;font-family:'Fraunces',Georgia,serif;font-size:17px;font-weight:600;letter-spacing:-.2px}
+.pcm .p{display:block;margin:2px 52px 6px 6px;font-size:13px;color:#4F6A6C;font-weight:500}
+.pc .add{position:absolute;right:10px;bottom:10px}
+.search{margin:2px 16px 12px;height:50px;border-radius:25px;border:1px solid #D9CCB1;background:#FFFCF6;display:flex;align-items:center;gap:10px;padding:0 18px;color:#4F6A6C;flex:none}
+.search input{flex:1;border:0;background:none;outline:none;font-family:inherit;font-size:15px;color:#0A2A2F;min-width:0}
+.prow{display:flex;align-items:center;gap:8px;padding:10px 14px 10px 10px;margin:0 16px 12px;background:#FFFCF6;border:1px solid #E6DCC8;border-radius:22px;box-shadow:0 14px 30px -22px rgba(10,42,47,.4)}
+.pmain{display:flex;align-items:center;gap:14px;flex:1;min-width:0;border:0;background:none;padding:0;text-align:left}
+.pmain .t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.pn{font-family:'Fraunces',Georgia,serif;font-size:18px;font-weight:600;letter-spacing:-.2px}
+.pp{font-size:15px;font-weight:600;color:#0A2A2F}
+.pnote{font-size:13px;color:#4F6A6C}
+.art{position:relative;height:330px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.artg{width:74%;height:auto}
+.rb{position:absolute;top:14px;background:#F7F2E8;border-radius:50%;border:0}
+.sheet{position:relative;margin-top:-30px;background:#F7F2E8;border-radius:30px 30px 0 0;padding:26px 18px 22px}
+.sheet h1{margin:0;font-size:34px;font-weight:600;letter-spacing:-.8px}
+.big{font-family:'Fraunces',Georgia,serif;font-size:28px;font-weight:600;margin:6px 0 14px;color:#0A2A2F}
+.big span{font-family:'DM Sans',system-ui,sans-serif;font-size:15px;font-weight:500;color:#4F6A6C}
+.bd{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+.bdg{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:16px;background:#F1E7D0;color:#5E4517;font-size:13px;font-weight:600}
+.bdg svg{width:16px;height:16px}
+.lbl{font-size:12px;font-weight:700;margin:0 0 12px;letter-spacing:.14em;text-transform:uppercase;color:#4F6A6C}
+.step{display:flex;align-items:center;justify-content:space-between;border:1px solid #D9CCB1;background:#FFFCF6;border-radius:30px;padding:4px}
+.step .v{font-family:'Fraunces',Georgia,serif;font-size:20px;font-weight:600}
+.sb{width:44px;height:44px;border-radius:50%;border:0;background:#0A2A2F;color:#C9A45C;display:flex;align-items:center;justify-content:center}
+.hint{font-size:13px;color:#4F6A6C;margin:10px 4px 22px}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.opt{display:flex;align-items:center;gap:10px;min-height:50px;padding:6px 14px;border-radius:16px;border:1px solid #D9CCB1;background:#FFFCF6;font-size:14px;font-weight:600;text-align:left}
+.opt.on{border-color:#0A2A2F;background:#F1E7D0;box-shadow:inset 0 0 0 1px #0A2A2F}
+.rd{width:20px;height:20px;border-radius:50%;border:1.5px solid #8FA1A2;flex:none;display:block}
+.on>.rd{border:6px solid #0A2A2F}
+.eta{margin-top:22px;display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:18px;background:#0A2A2F;color:#F7F2E8}
+.eta svg{color:#C9A45C}
+.eta b{display:block;font-size:15px;color:#F7F2E8}
+.eta span{display:block;font-size:13px;color:rgba(247,242,232,.78)}
+.line{display:flex;align-items:center;gap:14px;padding:14px 16px}
+.line+.line{border-top:1px solid #EFE6D3}
+.lt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.qs{display:inline-flex;align-items:center;gap:2px;margin-top:6px}
+.qs button{width:44px;height:44px;border:0;background:none;display:flex;align-items:center;justify-content:center;border-radius:12px}
+.qs .b{width:30px;height:30px;border-radius:50%;background:transparent;border:1px solid #C9B78F;display:flex;align-items:center;justify-content:center}
+.qs .b svg{width:14px;height:14px}
+.qs .q{min-width:52px;text-align:center;font-size:14px;font-weight:700}
+.tot{display:flex;justify-content:space-between;align-items:center;padding:6px 18px;font-size:15px}
+.tot.big2{font-family:'Fraunces',Georgia,serif;font-size:22px;font-weight:600;padding-top:14px}
+.ta{width:100%;min-height:80px;border-radius:16px;border:1px solid #D9CCB1;background:#FFFCF6;padding:14px 16px;font-family:inherit;font-size:14px;color:#0A2A2F;resize:none;outline:none}
+.rowb{display:flex;align-items:center;gap:10px;width:calc(100% - 32px);margin:14px 16px 0;height:54px;padding:0 16px;border-radius:16px;border:1px dashed #B9A67C;background:transparent;font-size:14px;font-weight:600;text-align:left}
+.sec{margin:16px 16px 0;padding:18px 16px}
+.sech{display:flex;align-items:center;gap:12px;margin-bottom:14px;font-family:'Fraunces',Georgia,serif;font-size:19px;font-weight:600}
+.sech .r{margin-left:auto;font-family:'DM Sans',system-ui,sans-serif}
+.num{width:28px;height:28px;border-radius:50%;background:#0A2A2F;color:#C9A45C;font-family:'DM Sans',system-ui,sans-serif;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.pm{display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:8px 16px;border-radius:18px;border:1px solid #D9CCB1;background:#FFFCF6;text-align:left;margin-bottom:10px}
+.pm.on{border-color:#0A2A2F;background:#F1E7D0;box-shadow:inset 0 0 0 1px #0A2A2F}
+.pm .t{display:flex;flex-direction:column;gap:1px}
+.pm b{font-size:15px}.pm span.s{font-size:13px;color:#4F6A6C}
+.pill{display:inline-flex;align-items:center;height:26px;padding:0 12px;border-radius:13px;font-size:12px;font-weight:700;letter-spacing:.03em}
+.pill.o{background:#F1E7D0;color:#5E4517}.pill.g{background:#DCEBE6;color:#14574B}
+.oc{display:flex;flex-direction:column;gap:12px;width:calc(100% - 32px);margin:0 16px 14px;padding:16px;text-align:left;background:#FFFCF6;border:1px solid #E6DCC8;border-radius:22px;box-shadow:0 14px 30px -22px rgba(10,42,47,.4)}
+.oc .r1{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.oc .r2{display:flex;align-items:center;gap:8px}
+.oc .r3{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px;color:#4F6A6C}
+.oc .r3 b{font-family:'Fraunces',Georgia,serif;font-size:18px;font-weight:600;color:#0A2A2F}
+.mut{font-size:13px;color:#4F6A6C}
+.tl{display:flex;gap:16px}
+.rail{display:flex;flex-direction:column;align-items:center}
+.dot{width:28px;height:28px;border-radius:50%;border:1.5px solid #C9B78F;background:#FFFCF6;display:flex;align-items:center;justify-content:center;flex:none}
+.dot.done{background:#0A2A2F;border-color:#0A2A2F;color:#C9A45C}
+.dot.now{background:#C9A45C;border-color:#C9A45C}
+.dot.now:after{content:'';width:8px;height:8px;border-radius:50%;background:#0A2A2F}
+.dot svg{width:16px;height:16px;stroke-width:2.4}
+.ln{width:1.5px;flex:1;min-height:34px;background:#DCCFB4}
+.ln.f{background:#0A2A2F}
+.tt{padding-bottom:22px;display:flex;flex-direction:column;gap:2px}
+.tt b{font-size:15px}
+.acc{display:flex;align-items:center;gap:16px;width:100%;min-height:58px;padding:0 18px;border:0;background:none;font-size:15px;font-weight:600;text-align:left}
+.acc svg:first-child{color:#7A5C22}
+.acc+.acc{border-top:1px solid #EFE6D3}
+.acc .r{margin-left:auto;color:#8FA1A2}
+.empty{margin:56px 32px 0;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
+.empty h2{margin:6px 0 0;font-size:24px}
+.empty p{margin:0 0 12px;color:#4F6A6C;font-size:14px;line-height:1.5}
+.fab{position:absolute;right:16px;bottom:86px;z-index:4;height:52px;padding:0 20px 0 16px;border-radius:26px;border:0;background:#0A2A2F;color:#F7F2E8;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;letter-spacing:.02em;box-shadow:0 16px 28px -10px rgba(10,42,47,.6)}
+.fab svg{color:#C9A45C}
+.fab .fb{min-width:20px;height:20px;border-radius:10px;background:#C9A45C;color:#0A2A2F;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px}
+.toast.up{bottom:150px}
+.scrim{position:absolute;inset:0;z-index:8;border:0;padding:0;background:rgba(10,42,47,.55)}
+.fsheet{position:absolute;left:0;right:0;bottom:0;z-index:9;background:#F7F2E8;border-radius:28px 28px 0 0;padding:10px 18px 20px;max-height:84%;overflow-y:auto}
+.grab{width:40px;height:4px;border-radius:2px;background:#D9CCB1;margin:0 auto 8px}
+.fh{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.fh h2{margin:0;font-size:26px;font-weight:600;letter-spacing:-.5px}
+.fsheet .lbl{margin:18px 0 10px}
+.fsheet .cta{margin:22px 0 0;width:100%}
+</style>
+</helmet>
+
+<div class="app">
+
+<!-- ================= HOME ================= -->
+<sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+<div class="scr">
+<div class="sc" style="padding-bottom: 96px">
+  <div class="hero">
+    <svg class="waves" viewBox="0 0 390 420" preserveAspectRatio="none" aria-hidden="true"><path d="M0 290 Q49 268 98 290 T195 290 T292 290 T390 290" fill="none" stroke="rgba(201,164,92,.22)" stroke-width="2"/><path d="M0 330 Q49 308 98 330 T195 330 T292 330 T390 330" fill="none" stroke="rgba(201,164,92,.22)" stroke-width="2"/><path d="M0 370 Q49 348 98 370 T195 370 T292 370 T390 370" fill="none" stroke="rgba(201,164,92,.22)" stroke-width="2"/></svg>
+    <svg class="hfish" viewBox="0 0 64 40" aria-hidden="true"><path d="M2 20C12 6 30 4 46 16l16-10v28L46 24C30 36 12 34 2 20z" fill="none" stroke="#C9A45C" stroke-opacity=".4" stroke-width=".5"/><path d="M14 10c-3 6-3 14 0 20M22 8c-3 7-3 17 0 24M30 8c-2 8-2 16 0 24" fill="none" stroke="#C9A45C" stroke-opacity=".25" stroke-width=".4"/></svg>
+    <div class="hd hz">
+      <button class="ib" style="color: #fff" aria-label="Open account menu" onClick="{{ goAccount }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+      <div class="brand"><span class="mark"><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M2 20C12 6 30 4 46 16l16-10v28L46 24C30 36 12 34 2 20z" fill="#0A2A2F"/></svg></span><span class="serif">Fish Paradise</span></div>
+      <button class="ib" style="color: #fff" aria-label="Open cart" onClick="{{ goCart }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 7z"/><path d="M9 7V6a3 3 0 0 1 6 0v1"/></svg><sc-if value="{{ hasCart }}" hint-placeholder-val="{{ false }}"><span class="badge">{{ cartCount }}</span></sc-if></button>
+    </div>
+    <button class="loc hz"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg>Deliver to Bhubaneswar<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+    <div class="eyebrow hz">Fresh from the coast</div>
+    <h2 class="serif hh hz">Fresh Seafood.<br/>Delivered to<br/>Your Door.</h2>
+    <p class="hs hz">Freshly sourced · Cleaned to order · Fast local delivery</p>
+    <button class="cta hcta hz" onClick="{{ goShop }}">Shop now<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+  </div>
+
+  <div class="card feat">
+    <div class="fi"><span class="fc"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12c3-5 8-6 12-3l6-3v12l-6-3c-4 3-9 2-12-3z"/></svg></span>Fresh catch daily</div>
+    <div class="fi"><span class="fc"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg></span>Hygienic cleaning</div>
+    <div class="fi"><span class="fc"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg></span>Fast delivery</div>
+    <div class="fi"><span class="fc"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></span>Trusted quality</div>
+  </div>
+
+  <div class="sh"><h2 class="serif">Shop by category</h2><button class="lnk" onClick="{{ goShopAll }}">View all<svg class="i" viewBox="0 0 24 24" style="width: 16px; height: 16px" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button></div>
+  <div class="cats">
+    <sc-for list="{{ cats }}" as="c" hint-placeholder-count="3">
+      <button class="cat" onClick="{{ c.pick }}"><span class="tile" style="background: {{ c.bg }}"><svg class="g" viewBox="0 0 64 40" aria-hidden="true"><path d="{{ c.glyph }}" fill="{{ c.fg }}" stroke="#E4CE9A" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round"/><circle cx="{{ c.ex }}" cy="{{ c.ey }}" r="{{ c.er }}" fill="#F7F2E8"/></svg></span>{{ c.label }}</button>
+    </sc-for>
+  </div>
+
+  <div class="sh"><h2 class="serif">Today's fresh catch</h2><button class="lnk" onClick="{{ goShopAll }}">See all<svg class="i" viewBox="0 0 24 24" style="width: 16px; height: 16px" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button></div>
+  <div class="hs2">
+    <sc-for list="{{ today }}" as="p" hint-placeholder-count="4">
+      <div class="pc">
+        <button class="pcm" onClick="{{ p.open }}"><span class="tile" style="background: {{ p.bg }}"><svg class="g" viewBox="0 0 64 40" aria-hidden="true"><path d="{{ p.glyph }}" fill="{{ p.fg }}" stroke="#E4CE9A" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round"/><circle cx="{{ p.ex }}" cy="{{ p.ey }}" r="{{ p.er }}" fill="#F7F2E8"/></svg></span><span class="n">{{ p.name }}</span><span class="p">{{ p.priceLabel }}</span></button>
+        <button class="add" aria-label="Add {{ p.name }} to cart" onClick="{{ p.add }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</div>
+</sc-if>
+
+<!-- ================= CATEGORY LISTING ================= -->
+<sc-if value="{{ isCategory }}" hint-placeholder-val="{{ false }}">
+<div class="scr">
+  <div class="hd">
+    <button class="ib" aria-label="Back to home" onClick="{{ goHome }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <h1 class="serif">Shop seafood</h1>
+    <button class="ib" aria-label="Open cart" onClick="{{ goCart }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 7z"/><path d="M9 7V6a3 3 0 0 1 6 0v1"/></svg><sc-if value="{{ hasCart }}" hint-placeholder-val="{{ false }}"><span class="badge">{{ cartCount }}</span></sc-if></button>
+  </div>
+  <div class="search"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.2-4.2"/></svg><input type="search" aria-label="Search seafood" placeholder="Search fish, prawns, crab" value="{{ query }}" onChange="{{ onQuery }}"/></div>
+  <div class="chips">
+    <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4"><button class="{{ t.cls }}" onClick="{{ t.pick }}">{{ t.label }}</button></sc-for>
+  </div>
+  <div class="sc" style="padding-bottom: 160px">
+    <sc-for list="{{ list }}" as="p" hint-placeholder-count="4">
+      <div class="prow">
+        <button class="pmain" onClick="{{ p.open }}"><span class="tile t72" style="background: {{ p.bg }}"><svg class="g" viewBox="0 0 64 40" aria-hidden="true"><path d="{{ p.glyph }}" fill="{{ p.fg }}" stroke="#E4CE9A" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round"/><circle cx="{{ p.ex }}" cy="{{ p.ey }}" r="{{ p.er }}" fill="#F7F2E8"/></svg></span><span class="t"><span class="pn">{{ p.name }}</span><span class="pp">{{ p.priceLabel }}</span><span class="pnote">{{ p.note }}</span></span></button>
+        <button class="add" aria-label="Add {{ p.name }} to cart" onClick="{{ p.add }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+      </div>
+    </sc-for>
+    <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}"><div class="empty"><h2 class="serif">Nothing found</h2><p>Try a different name or pick another category.</p></div></sc-if>
+  </div>
+  <button class="fab" onClick="{{ openFilter }}" aria-label="Open filters"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>Filter<sc-if value="{{ hasActive }}" hint-placeholder-val="{{ false }}"><span class="fb">{{ activeCount }}</span></sc-if></button>
+</div>
+</sc-if>
+
+<!-- ================= PRODUCT DETAILS ================= -->
+<sc-if value="{{ isProduct }}" hint-placeholder-val="{{ false }}">
+<div class="scr">
+  <div class="sc">
+    <div class="art" style="background: {{ sp.bg }}">
+      <svg class="artg" viewBox="0 0 64 40" aria-hidden="true"><path d="{{ sp.glyph }}" fill="{{ sp.fg }}" stroke="#E4CE9A" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round"/><circle cx="{{ sp.ex }}" cy="{{ sp.ey }}" r="{{ sp.er }}" fill="#fff"/></svg>
+      <button class="ib rb" style="left: 12px" aria-label="Back to shop" onClick="{{ goShop }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+      <button class="ib rb" style="right: 12px" aria-label="Save to favourites" onClick="{{ toggleFav }}"><svg class="{{ favCls }}" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
+    </div>
+    <div class="sheet">
+      <h1 class="serif">{{ sp.name }}</h1>
+      <div class="big">{{ spPrice }} <span>/ kg</span></div>
+      <div class="bd">
+        <span class="bdg"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{ sp.note }}</span>
+        <span class="bdg"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Cleaned to order</span>
+      </div>
+      <p class="lbl">Choose quantity</p>
+      <div class="step">
+        <button class="sb" aria-label="Decrease quantity" onClick="{{ pqMinus }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+        <span class="v">{{ pqLabel }}</span>
+        <button class="sb" aria-label="Increase quantity" onClick="{{ pqPlus }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+      </div>
+      <p class="hint">You can select 500 g steps.</p>
+      <p class="lbl">Cleaning preference</p>
+      <div class="opts">
+        <sc-for list="{{ cleanOpts }}" as="o" hint-placeholder-count="4"><button class="{{ o.cls }}" onClick="{{ o.pick }}"><span class="rd"></span>{{ o.label }}</button></sc-for>
+      </div>
+      <div class="eta"><svg class="i" viewBox="0 0 24 24" style="width: 28px; height: 28px" aria-hidden="true"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg><div><b>Today · 30 – 60 mins</b><span>Freshly cleaned and packed</span></div></div>
+    </div>
+  </div>
+  <div class="dock"><button class="cta" onClick="{{ addFromProduct }}">Add to cart · {{ pTotal }}</button></div>
+</div>
+</sc-if>
+
+<!-- ================= CART ================= -->
+<sc-if value="{{ isCart }}" hint-placeholder-val="{{ false }}">
+<div class="scr">
+  <div class="hd">
+    <button class="ib" aria-label="Back" onClick="{{ goShop }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <h1 class="serif">Your cart</h1>
+    <sc-if value="{{ hasCart }}" hint-placeholder-val="{{ true }}"><button class="lnk" onClick="{{ clearCart }}">Clear all</button></sc-if>
+  </div>
+  <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
+    <div class="empty">
+      <svg class="i" viewBox="0 0 24 24" style="width: 44px; height: 44px; color: #B08A45" aria-hidden="true"><path d="M5 7h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 7z"/><path d="M9 7V6a3 3 0 0 1 6 0v1"/></svg>
+      <h2 class="serif">Your cart is empty</h2>
+      <p>Add today's fresh catch and we'll clean and pack it for you.</p>
+      <button class="cta" style="margin: 0; width: 220px" onClick="{{ goShopAll }}">Start shopping</button>
+    </div>
+  </sc-if>
+  <sc-if value="{{ hasCart }}" hint-placeholder-val="{{ true }}">
+    <div class="sc">
+      <div class="card" style="margin: 4px 16px 0">
+        <sc-for list="{{ lines }}" as="l" hint-placeholder-count="2">
+          <div class="line" style="align-items: flex-start">
+            <span class="tile t72" style="background: {{ l.bg }}"><svg class="g" viewBox="0 0 64 40" aria-hidden="true"><path d="{{ l.glyph }}" fill="{{ l.fg }}" stroke="#E4CE9A" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round"/><circle cx="{{ l.ex }}" cy="{{ l.ey }}" r="{{ l.er }}" fill="#F7F2E8"/></svg></span>
+            <div class="lt">
+              <span class="pn">{{ l.name }}</span>
+              <span class="mut">{{ l.priceLabel }} · {{ l.clean }}</span>
+              <div class="qs">
+                <button aria-label="Decrease {{ l.name }}" onClick="{{ l.minus }}"><span class="b"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></span></button>
+                <span class="q">{{ l.qtyLabel }}</span>
+                <button aria-label="Increase {{ l.name }}" onClick="{{ l.plus }}"><span class="b"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></button>
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; align-self: stretch">
+              <button class="ib" style="width: 36px; height: 36px; margin: -6px -8px 0 0; color: #4A686C" aria-label="Remove {{ l.name }}" onClick="{{ l.del }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+              <b style="font-size: 16px">{{ l.lineTotal }}</b>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="margin: 16px 16px 0">
+        <p class="lbl" style="margin-bottom: 8px">Add special instructions <span class="mut" style="font-weight: 500">(optional)</span></p>
+        <textarea class="ta" aria-label="Special instructions" placeholder="e.g. Extra cleaning, specific size, etc." value="{{ notes }}" onChange="{{ onNotes }}"></textarea>
+      </div>
+      <button class="rowb"><svg class="i" viewBox="0 0 24 24" style="color: #B08A45" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.3"/></svg>Apply coupon<svg class="i" viewBox="0 0 24 24" style="margin-left: auto" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+      <div class="card" style="margin: 16px 16px 20px; padding: 8px 0 12px">
+        <div class="tot"><span>Subtotal</span><span>{{ subtotalL }}</span></div>
+        <div class="tot"><span>Delivery</span><span>{{ deliveryL }}</span></div>
+        <div class="tot big2"><span>Total</span><span>{{ totalL }}</span></div>
+      </div>
+    </div>
+    <div class="dock"><button class="cta" onClick="{{ goCheckout }}">Proceed to checkout</button></div>
+  </sc-if>
+</div>
+</sc-if>
+
+<!-- ================= CHECKOUT ================= -->
+<sc-if value="{{ isCheckout }}" hint-placeholder-val="{{ false }}">
+<div class="scr">
+  <div class="hd">
+    <button class="ib" aria-label="Back to cart" onClick="{{ goCart }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <h1 class="serif">Checkout</h1>
+  </div>
+  <div class="sc" style="padding-bottom: 16px">
+    <div class="card sec" style="margin-top: 4px">
+      <div class="sech"><span class="num">1</span>Delivery address<button class="lnk r">Change</button></div>
+      <div style="display: flex; gap: 12px; align-items: flex-start; padding: 12px; border-radius: 14px; background: #F1E7D0">
+        <svg class="i" viewBox="0 0 24 24" style="color: #0A2A2F; margin-top: 2px" aria-hidden="true"><path d="M4 11l8-7 8 7v9H4z"/><path d="M10 20v-6h4v6"/></svg>
+        <div><b>Home</b><div class="mut" style="line-height: 1.45; margin-top: 2px">Plot No. 123, Khandagiri, Bhubaneswar, Odisha – 751030</div></div>
+      </div>
+      <button class="lnk" style="margin: 6px auto 0"><svg class="i" viewBox="0 0 24 24" style="width: 16px; height: 16px" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add new address</button>
+    </div>
+
+    <div class="card sec">
+      <div class="sech"><span class="num">2</span>Delivery slot</div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <sc-for list="{{ slots }}" as="s" hint-placeholder-count="2">
+          <button class="{{ s.cls }}" style="min-height: 60px" onClick="{{ s.pick }}"><span class="rd"></span><span style="display: flex; flex-direction: column; gap: 2px"><b>{{ s.title }}</b><span class="mut">{{ s.sub }}</span></span></button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div class="card sec" style="margin-bottom: 8px">
+      <div class="sech"><span class="num">3</span>Order summary</div>
+      <sc-for list="{{ lines }}" as="l" hint-placeholder-count="2">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 6px 0">
+          <span class="tile t56" style="background: {{ l.bg }}"><svg class="g" viewBox="0 0 64 40" aria-hidden="true"><path d="{{ l.glyph }}" fill="{{ l.fg }}" stroke="#E4CE9A" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round"/><circle cx="{{ l.ex }}" cy="{{ l.ey }}" r="{{ l.er }}" fill="#F7F2E8"/></svg></span>
+          <div class="lt"><b>{{ l.name }}</b><span class="mut">{{ l.sub }}</span></div>
+          <b>{{ l.lineTotal }}</b>
+        </div>
+      </sc-for>
+      <div style="border-top: 1px solid #E8DDCB; margin-top: 8px; padding-top: 10px">
+        <div style="display: flex; justify-content: space-between; font-size: 14px; padding: 2px 0"><span class="mut">Delivery</span><span>{{ deliveryL }}</span></div>
+        <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: 700; padding-top: 8px"><span>Total</span><span>{{ totalL }}</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="dock"><button class="cta" onClick="{{ goPayment }}">Continue to payment</button></div>
+</div>
+</sc-if>
+
+<!-- ================= PAYMENT ================= -->
+<sc-if value="{{ isPayment }}" hint-placeholder-val="{{ false }}">
+<div class="scr">
+  <div class="hd">
+    <button class="ib" aria-label="Back to checkout" onClick="{{ goCheckout }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <h1 class="serif">Payment</h1>
+  </div>
+  <div class="sc" style="padding-bottom: 16px">
+    <div class="card" style="margin: 4px 16px 0; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between">
+      <div><div class="mut">Total amount</div><div class="serif" style="font-size: 32px; font-weight: 700; letter-spacing: -.5px">{{ totalL }}</div></div>
+      <button class="lnk" onClick="{{ goCheckout }}">View details<svg class="i" viewBox="0 0 24 24" style="width: 16px; height: 16px" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+    <p class="lbl" style="margin: 22px 16px 10px; font-size: 17px">Select payment method</p>
+    <div style="padding: 0 16px">
+      <sc-for list="{{ payOpts }}" as="m" hint-placeholder-count="4">
+        <button class="{{ m.cls }}" onClick="{{ m.pick }}"><span class="rd"></span><span class="t"><b>{{ m.title }}</b><span class="s">{{ m.sub }}</span></span></button>
+      </sc-for>
+    </div>
+  </div>
+  <div class="dock">
+    <button class="cta" onClick="{{ placeOrder }}">{{ payLabel }}</button>
+    <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; font-size: 12px; color: #4A686C"><svg class="i" viewBox="0 0 24 24" style="width: 16px; height: 16px" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>Secure, encrypted payment</div>
+  </div>
+</div>
+</sc-if>
+
+<!-- ================= ORDER CONFIRMED ================= -->
+<sc-if value="{{ isConfirmed }}" hint-placeholder-val="{{ false }}">
+<div class="scr">
+  <div class="sc" style="padding-bottom: 8px">
+    <div style="position: relative; display: flex; flex-direction: column; align-items: center; padding: 64px 16px 0">
+      <span style="position: absolute; left: 88px; top: 60px; width: 8px; height: 8px; border-radius: 2px; background: #B08A45; transform: rotate(20deg)"></span>
+      <span style="position: absolute; left: 60px; top: 108px; width: 6px; height: 6px; border-radius: 50%; background: #1B5A61"></span>
+      <span style="position: absolute; right: 90px; top: 64px; width: 7px; height: 7px; border-radius: 50%; background: #E0A15A"></span>
+      <span style="position: absolute; right: 62px; top: 112px; width: 8px; height: 8px; border-radius: 2px; background: #1B5A61; transform: rotate(-24deg)"></span>
+      <span style="position: absolute; left: 120px; top: 34px; width: 6px; height: 6px; border-radius: 50%; background: #E0A15A"></span>
+      <span style="width: 92px; height: 92px; border-radius: 50%; background: #0A2A2F; color: #C9A45C; box-shadow: 0 0 0 7px #F1E7D0; display: flex; align-items: center; justify-content: center"><svg class="i" viewBox="0 0 24 24" style="width: 48px; height: 48px; stroke-width: 2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+      <h1 class="serif" style="margin: 20px 0 4px; font-size: 32px; letter-spacing: -.4px">Order confirmed!</h1>
+      <p class="mut" style="margin: 0; font-size: 15px">Thank you for your order.</p>
+    </div>
+    <div class="card" style="margin: 28px 16px 0; padding: 16px">
+      <div style="font-size: 17px; font-weight: 700">Order #{{ lo.id }}</div>
+      <div class="mut" style="margin: 2px 0 14px">Placed on {{ lo.when }}</div>
+      <div class="eta" style="margin-top: 0"><svg class="i" viewBox="0 0 24 24" style="width: 28px; height: 28px" aria-hidden="true"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg><div><span>Estimated delivery</span><b>{{ lo.eta }}</b></div></div>
+    </div>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 10px; padding: 12px 0 20px; flex: none">
+    <button class="cta ink" onClick="{{ trackLast }}">Track order</button>
+    <button class="cta out" onClick="{{ goShopAll }}">Continue shopping</button>
+  </div>
+</div>
+</sc-if>
+
+<!-- ================= ORDER TRACKING ================= -->
+<sc-if value="{{ isTracking }}" hint-placeholder-val="{{ false }}">
+<div class="scr">
+  <div class="hd">
+    <button class="ib" aria-label="Back to my orders" onClick="{{ goOrders }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <h1 class="serif">Order #{{ to.id }}</h1>
+  </div>
+  <div class="sc" style="padding-bottom: 8px">
+    <div class="card" style="margin: 8px 16px 0; padding: 20px 18px 4px">
+      <sc-for list="{{ to.steps }}" as="t" hint-placeholder-count="4">
+        <div class="tl">
+          <div class="rail">
+            <span class="{{ t.dotCls }}"><sc-if value="{{ t.isDone }}" hint-placeholder-val="{{ false }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></sc-if></span>
+            <sc-if value="{{ t.hasLine }}" hint-placeholder-val="{{ true }}"><span class="{{ t.lnCls }}"></span></sc-if>
+          </div>
+          <div class="tt"><b>{{ t.label }}</b><span class="mut">{{ t.time }}</span></div>
+        </div>
+      </sc-for>
+    </div>
+    <div class="eta" style="margin: 14px 16px 0; align-items: flex-start"><svg class="i" viewBox="0 0 24 24" style="width: 28px; height: 28px" aria-hidden="true"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg><div><b>{{ to.headline }}</b><span>{{ to.subline }}</span></div></div>
+    <div class="card" style="margin: 14px 16px 0; padding: 4px 0">
+      <sc-for list="{{ to.lines }}" as="l" hint-placeholder-count="2">
+        <div class="line"><span class="tile t44" style="background: {{ l.bg }}"><svg class="g" viewBox="0 0 64 40" aria-hidden="true"><path d="{{ l.glyph }}" fill="{{ l.fg }}" stroke="#E4CE9A" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round"/><circle cx="{{ l.ex }}" cy="{{ l.ey }}" r="{{ l.er }}" fill="#F7F2E8"/></svg></span><div class="lt"><b>{{ l.name }}</b><span class="mut">{{ l.sub }}</span></div><b>{{ l.lineTotal }}</b></div>
+      </sc-for>
+      <div class="tot big2" style="border-top: 1px solid #E8DDCB"><span>Total paid</span><span>{{ to.total }}</span></div>
+    </div>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 10px; padding: 12px 0 18px; flex: none">
+    <button class="cta out"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>Call shop</button>
+  </div>
+</div>
+</sc-if>
+
+<!-- ================= MY ORDERS ================= -->
+<sc-if value="{{ isOrders }}" hint-placeholder-val="{{ false }}">
+<div class="scr">
+  <div class="hd">
+    <button class="ib" aria-label="Back to home" onClick="{{ goHome }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <h1 class="serif">My orders</h1>
+  </div>
+  <div class="chips">
+    <sc-for list="{{ ofilters }}" as="f" hint-placeholder-count="4"><button class="{{ f.cls }}" onClick="{{ f.pick }}">{{ f.label }}</button></sc-for>
+  </div>
+  <div class="sc" style="padding-bottom: 96px">
+    <sc-for list="{{ orderCards }}" as="o" hint-placeholder-count="2">
+      <button class="oc" onClick="{{ o.open }}">
+        <span class="r1"><b style="font-size: 16px">#{{ o.id }}</b><span class="{{ o.stCls }}">{{ o.status }}</span></span>
+        <span class="mut">{{ o.when }}</span>
+        <span class="r2"><sc-for list="{{ o.thumbs }}" as="th" hint-placeholder-count="2"><span class="tile t44" style="background: {{ th.bg }}"><svg class="g" viewBox="0 0 64 40" aria-hidden="true"><path d="{{ th.glyph }}" fill="{{ th.fg }}" stroke="#E4CE9A" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round"/><circle cx="{{ th.ex }}" cy="{{ th.ey }}" r="{{ th.er }}" fill="#F7F2E8"/></svg></span></sc-for></span>
+        <span class="r3"><span>{{ o.summary }}</span><b>{{ o.total }}</b></span>
+      </button>
+    </sc-for>
+    <sc-if value="{{ noOrders }}" hint-placeholder-val="{{ false }}"><div class="empty"><h2 class="serif">No orders here</h2><p>Orders with this status will show up here.</p></div></sc-if>
+  </div>
+</div>
+</sc-if>
+
+<!-- ================= ACCOUNT ================= -->
+<sc-if value="{{ isAccount }}" hint-placeholder-val="{{ false }}">
+<div class="scr">
+  <div class="hd">
+    <button class="ib" aria-label="Back to home" onClick="{{ goHome }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <h1 class="serif">My account</h1>
+  </div>
+  <div class="sc" style="padding-bottom: 96px">
+    <div class="card" style="margin: 8px 16px 0; padding: 14px; display: flex; align-items: center; gap: 14px">
+      <span style="width: 56px; height: 56px; border-radius: 50%; background: #0A2A2F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px">RS</span>
+      <div><b style="font-size: 17px">Rahul Sharma</b><div class="mut">rahul@example.com</div></div>
+    </div>
+    <div class="card" style="margin: 16px 16px 0; overflow: hidden">
+      <button class="acc" onClick="{{ goOrders }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg>My orders<svg class="i r" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+      <button class="acc"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg>Saved addresses<svg class="i r" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+      <button class="acc"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>Favourites<svg class="i r" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+      <button class="acc"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.3"/></svg>Offers &amp; rewards<svg class="i r" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+      <button class="acc"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 1-1 1.7M12 17h.01"/></svg>Help &amp; support<svg class="i r" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+      <button class="acc"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/></svg>About Fish Paradise<svg class="i r" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+    <button class="acc" style="margin: 12px 16px 0; width: calc(100% - 32px); color: #B3371A"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H5v16h5M15 8l4 4-4 4M19 12H9"/></svg>Log out</button>
+  </div>
+</div>
+</sc-if>
+
+<!-- ================= SHARED: TOAST + BOTTOM NAV ================= -->
+<sc-if value="{{ showFilter }}" hint-placeholder-val="{{ false }}">
+<button class="scrim" aria-label="Close filters" onClick="{{ closeFilter }}"></button>
+<div class="fsheet" role="dialog" aria-label="Filters">
+  <div class="grab"></div>
+  <div class="fh"><h2 class="serif">Filters</h2><button class="lnk" onClick="{{ resetFilters }}">Reset</button></div>
+  <p class="lbl">Sort by</p>
+  <div class="opts"><sc-for list="{{ sortOpts }}" as="o" hint-placeholder-count="4"><button class="{{ o.cls }}" onClick="{{ o.pick }}"><span class="rd"></span>{{ o.label }}</button></sc-for></div>
+  <p class="lbl">Price per kg</p>
+  <div class="opts"><sc-for list="{{ priceOpts }}" as="o" hint-placeholder-count="4"><button class="{{ o.cls }}" onClick="{{ o.pick }}"><span class="rd"></span>{{ o.label }}</button></sc-for></div>
+  <p class="lbl">Category</p>
+  <div class="opts"><sc-for list="{{ catOpts }}" as="o" hint-placeholder-count="4"><button class="{{ o.cls }}" onClick="{{ o.pick }}"><span class="rd"></span>{{ o.label }}</button></sc-for></div>
+  <button class="cta" onClick="{{ closeFilter }}">{{ resultLabel }}</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+<div class="{{ toastCls }}" role="status"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{{ toast }}<button onClick="{{ goCart }}">View cart</button></div>
+</sc-if>
+
+<sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+<nav class="nav" aria-label="Main">
+  <button class="{{ nHome }}" onClick="{{ goHome }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v9H4z"/><path d="M10 20v-6h4v6"/></svg>Home</button>
+  <button class="{{ nShop }}" onClick="{{ goShopAll }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9l1-4h14l1 4"/><path d="M4 9a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0A2.7 2.7 0 0 0 20 9v10H4z"/></svg>Shop</button>
+  <button class="{{ nOrders }}" onClick="{{ goOrders }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg>Orders</button>
+  <button class="{{ nAccount }}" onClick="{{ goAccount }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>Account</button>
+</nav>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  state = {
+    screen: 'home', cat: 'all', query: '', sel: 'pomfret', pq: 1, pc: 'Whole cleaned',
+    cart: [], notes: '', slot: 'asap', pay: 'upi', placed: 0, ofilter: 'All',
+    trackId: null, lastId: null, fav: {}, toast: '', filterOpen: false, sort: 'rec', price: 'any',
+    orders: [
+      { id: 'FP1023', placedAt: new Date(2026, 8, 28, 15, 15).getTime(), stage: 3, eta: '', lines: [{ id: 'rohu', qty: 1, clean: 'Whole cleaned' }, { id: 'white', qty: 0.5, clean: 'Cleaned' }] },
+      { id: 'FP1022', placedAt: new Date(2026, 8, 25, 11, 20).getTime(), stage: 3, eta: '', lines: [{ id: 'crab', qty: 1, clean: 'Cleaned' }] }
+    ]
+  };
+
+  catalog() {
+    return [
+      { id: 'rohu', name: 'Rohu', cat: 'fish', price: 320, note: 'Freshly sourced today', type: 'fish', bg: '#0F3238', fg: '#7FB0B5' },
+      { id: 'pomfret', name: 'Pomfret', cat: 'fish', price: 650, note: 'Freshly sourced today', type: 'fish', bg: '#123A41', fg: '#A9C7CB' },
+      { id: 'seer', name: 'Seer Fish', cat: 'fish', price: 720, note: 'Fresh & tasty', type: 'fish', bg: '#10363A', fg: '#8FBFA9' },
+      { id: 'tilapia', name: 'Tilapia', cat: 'fish', price: 280, note: 'Fresh & clean', type: 'fish', bg: '#1B3A38', fg: '#C2C48A' },
+      { id: 'hilsa', name: 'Hilsa (Ilish)', cat: 'fish', price: 580, note: 'Seasonal catch', type: 'fish', bg: '#132F3D', fg: '#9DB5E0' },
+      { id: 'mackerel', name: 'Mackerel', cat: 'fish', price: 250, note: 'Local catch', type: 'fish', bg: '#12353A', fg: '#94B7B0' },
+      { id: 'tiger', name: 'Tiger Prawns', cat: 'prawns', price: 780, note: 'Large size', type: 'prawn', bg: '#2E1E1A', fg: '#E8926A' },
+      { id: 'white', name: 'White Prawns', cat: 'prawns', price: 520, note: 'Medium size', type: 'prawn', bg: '#2B211B', fg: '#EBB48C' },
+      { id: 'crab', name: 'Crab', cat: 'crab', price: 420, note: 'Fresh & cleaned', type: 'crab', bg: '#2F1C1C', fg: '#E08A7A' }
+    ];
+  }
+  byId(id) { return this.catalog().find(p => p.id === id); }
+  fmt(n) { return '₹' + Number(n).toLocaleString('en-IN'); }
+  qlabel(q) { return q < 1 ? Math.round(q * 1000) + ' g' : q + ' kg'; }
+  fmtDate(ms) { const d = new Date(ms); const m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return d.getDate() + ' ' + m[d.getMonth()] + ' ' + d.getFullYear(); }
+  fmtTime(ms) { const d = new Date(ms); let h = d.getHours(); const mi = String(d.getMinutes()).padStart(2, '0'); const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; return h + ':' + mi + ' ' + ap; }
+  glyph(p) {
+    const G = {
+      fish: { glyph: 'M2 20C12 6 30 4 46 16l16-10v28L46 24C30 36 12 34 2 20z', ex: 14, ey: 17, er: 2 },
+      prawn: { glyph: 'M10 30C8 16 22 6 38 8c10 1 16 8 16 16l-8-2c0-6-4-9-10-9-10 0-16 6-16 14 0 3 1 5 2 8-6 0-11-1-12-5zM50 24l10-6-2 12z', ex: 44, ey: 14, er: 1.8 },
+      crab: { glyph: 'M15 24a17 11 0 1 0 34 0a17 11 0 1 0-34 0zM3 11a6 6 0 1 0 12 0a6 6 0 1 0-12 0zM49 11a6 6 0 1 0 12 0a6 6 0 1 0-12 0zM14 15L22 21M50 15L42 21M17 32L10 37M47 32L54 37M24 34L21 39M40 34L43 39', ex: 32, ey: 20, er: 0 }
+    };
+    return G[p.type];
+  }
+  mk(p) {
+    return { ...p, ...this.glyph(p), priceLabel: this.fmt(p.price) + '/kg',
+      open: () => this.setState({ screen: 'product', sel: p.id, pq: 1, pc: 'Whole cleaned', toast: '' }),
+      add: () => this.addToCart(p.id, 1, 'Whole cleaned') };
+  }
+  addToCart(id, qty, clean, thenCart) {
+    const cart = this.state.cart.slice();
+    const i = cart.findIndex(l => l.id === id);
+    if (i >= 0) cart[i] = { ...cart[i], qty: cart[i].qty + qty, clean: clean };
+    else cart.push({ id: id, qty: qty, clean: clean });
+    if (thenCart) { this.setState({ cart: cart, screen: 'cart', toast: '' }); return; }
+    this.setState({ cart: cart, toast: this.byId(id).name + ' added to cart' });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ toast: '' }), 2400);
+  }
+  statusName(o) { return o.stage < 2 ? 'Preparing' : o.stage === 2 ? 'Out for delivery' : 'Delivered'; }
+  orderLines(o) {
+    return o.lines.map(l => {
+      const p = this.byId(l.id);
+      return { ...this.mk(p), qtyLabel: this.qlabel(l.qty), sub: this.qlabel(l.qty) + ' (' + l.clean + ')', lineTotal: this.fmt(p.price * l.qty), raw: p.price * l.qty };
+    });
+  }
+  placeOrder() {
+    const s = this.state;
+    const now = Date.now();
+    const o = { id: 'FP' + (1024 + s.placed), placedAt: now, stage: 1, eta: s.slot === 'asap' ? '35 – 45 minutes' : 'Today, 5:00 – 6:00 PM', lines: s.cart.map(l => ({ ...l })) };
+    this.setState({ orders: [o, ...s.orders], cart: [], notes: '', placed: s.placed + 1, lastId: o.id, trackId: o.id, screen: 'confirmed', toast: '' });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const cat = this.catalog();
+    const go = (screen, extra) => () => this.setState({ screen: screen, toast: '', filterOpen: false, ...(extra || {}) });
+
+    // listing
+    const q = s.query.trim().toLowerCase();
+    const priceOk = p => s.price === 'any' || (s.price === 'u300' && p.price < 300) || (s.price === 'mid' && p.price >= 300 && p.price <= 600) || (s.price === 'o600' && p.price > 600);
+    const arr = cat.filter(p => (s.cat === 'all' || p.cat === s.cat) && priceOk(p) && (!q || p.name.toLowerCase().includes(q)));
+    if (s.sort === 'low') arr.sort((a, b) => a.price - b.price);
+    else if (s.sort === 'high') arr.sort((a, b) => b.price - a.price);
+    else if (s.sort === 'az') arr.sort((a, b) => a.name.localeCompare(b.name));
+    const list = arr.map(p => this.mk(p));
+    const mkOpts = (arr2, key) => arr2.map(o => ({ label: o[1], cls: s[key] === o[0] ? 'opt on' : 'opt', pick: () => this.setState({ [key]: o[0] }) }));
+    const sortOpts = mkOpts([['rec', 'Recommended'], ['low', 'Price: low to high'], ['high', 'Price: high to low'], ['az', 'Name: A to Z']], 'sort');
+    const priceOpts = mkOpts([['any', 'Any price'], ['u300', 'Under ₹300'], ['mid', '₹300 – ₹600'], ['o600', 'Above ₹600']], 'price');
+    const catOpts = mkOpts([['all', 'All'], ['fish', 'Fish'], ['prawns', 'Prawns'], ['crab', 'Crab']], 'cat');
+    const activeCount = (s.sort !== 'rec' ? 1 : 0) + (s.price !== 'any' ? 1 : 0) + (s.cat !== 'all' ? 1 : 0);
+    const tabs = [['all', 'All'], ['fish', 'Fish'], ['prawns', 'Prawns'], ['crab', 'Crab']].map(t => ({ label: t[1], cls: s.cat === t[0] ? 'chip on' : 'chip', pick: () => this.setState({ cat: t[0] }) }));
+    const cats = [['fish', 'Fish', 'rohu'], ['prawns', 'Prawns', 'tiger'], ['crab', 'Crab', 'crab']].map(c => ({ ...this.mk(this.byId(c[2])), label: c[1], pick: () => this.setState({ screen: 'category', cat: c[0], query: '', toast: '' }) }));
+    const today = ['pomfret', 'tiger', 'rohu', 'crab'].map(id => this.mk(this.byId(id)));
+
+    // product
+    const spRaw = this.byId(s.sel);
+    const sp = this.mk(spRaw);
+    const cleanOpts = ['Whole cleaned', 'Curry cut', 'Fry cut', 'Custom cut'].map(l => ({ label: l, cls: s.pc === l ? 'opt on' : 'opt', pick: () => this.setState({ pc: l }) }));
+
+    // cart
+    const lines = s.cart.map(l => {
+      const p = this.byId(l.id);
+      return { ...this.mk(p), clean: l.clean, qtyLabel: this.qlabel(l.qty), sub: this.qlabel(l.qty) + ' (' + l.clean + ')', raw: p.price * l.qty, lineTotal: this.fmt(p.price * l.qty),
+        minus: () => this.setState({ cart: this.state.cart.map(x => x.id === l.id ? { ...x, qty: Math.max(0.5, x.qty - 0.5) } : x) }),
+        plus: () => this.setState({ cart: this.state.cart.map(x => x.id === l.id ? { ...x, qty: Math.min(20, x.qty + 0.5) } : x) }),
+        del: () => this.setState({ cart: this.state.cart.filter(x => x.id !== l.id) }) };
+    });
+    const subtotal = lines.reduce((a, l) => a + l.raw, 0);
+    const delivery = lines.length ? 40 : 0;
+
+    // checkout / payment
+    const slots = [{ id: 'asap', title: 'ASAP', sub: '30 – 60 mins' }, { id: 'later', title: 'Schedule delivery', sub: 'Today, 5:00 – 6:00 PM' }].map(x => ({ ...x, cls: s.slot === x.id ? 'opt on' : 'opt', pick: () => this.setState({ slot: x.id }) }));
+    const payOpts = [
+      { id: 'upi', title: 'UPI', sub: 'Pay with any UPI app' },
+      { id: 'card', title: 'Credit / Debit card', sub: 'Visa, Mastercard, RuPay' },
+      { id: 'net', title: 'Net banking', sub: 'All major banks' },
+      { id: 'cod', title: 'Cash on delivery', sub: 'Pay when your order arrives' }
+    ].map(x => ({ ...x, cls: s.pay === x.id ? 'pm on' : 'pm', pick: () => this.setState({ pay: x.id }) }));
+    const totalL = this.fmt(subtotal + delivery);
+
+    // orders
+    const statuses = ['All', 'Preparing', 'Out for delivery', 'Delivered'];
+    const ofilters = statuses.map(f => ({ label: f, cls: s.ofilter === f ? 'chip on' : 'chip', pick: () => this.setState({ ofilter: f }) }));
+    const orderCards = s.orders.filter(o => s.ofilter === 'All' || this.statusName(o) === s.ofilter).map(o => {
+      const ol = this.orderLines(o);
+      const st = this.statusName(o);
+      return { id: o.id, when: this.fmtDate(o.placedAt) + ' · ' + this.fmtTime(o.placedAt), status: st, stCls: st === 'Delivered' ? 'pill g' : 'pill o', thumbs: ol.slice(0, 3),
+        summary: ol.map(l => l.name + ' (' + l.qtyLabel + ')').join(', '), total: this.fmt(ol.reduce((a, l) => a + l.raw, 0) + 40), open: () => this.setState({ screen: 'tracking', trackId: o.id }) };
+    });
+
+    // confirmation + tracking
+    const findO = id => s.orders.find(o => o.id === id) || s.orders[0];
+    const loRaw = findO(s.lastId);
+    const lo = { id: loRaw.id, when: this.fmtDate(loRaw.placedAt) + ', ' + this.fmtTime(loRaw.placedAt), eta: loRaw.eta || '35 – 45 minutes' };
+    const toRaw = findO(s.trackId);
+    const tl = this.orderLines(toRaw);
+    const defs = [['Confirmed', 0], ['Cleaning & packing', 8], ['Out for delivery', 35], ['Delivered', 45]];
+    const steps = defs.map((d, i) => {
+      const done = i < toRaw.stage || toRaw.stage === 3;
+      const now = !done && i === toRaw.stage;
+      return { label: d[0], time: (done || now ? '' : 'Est. ') + this.fmtTime(toRaw.placedAt + d[1] * 60000), isDone: done,
+        dotCls: done ? 'dot done' : now ? 'dot now' : 'dot', hasLine: i < 3, lnCls: (i < toRaw.stage) ? 'ln f' : 'ln' };
+    });
+    const heads = ['Order received', 'Your order is being prepared', 'Your order is on the way', 'Delivered. Enjoy your fresh seafood!'];
+    const subs = ['We have got your order and will start cleaning shortly.', 'We are cleaning and packing your fresh seafood.', 'Your delivery partner is heading to you.', 'Thank you for shopping with Fish Paradise.'];
+    const to = { id: toRaw.id, steps: steps, headline: heads[toRaw.stage], subline: subs[toRaw.stage], lines: tl, total: this.fmt(tl.reduce((a, l) => a + l.raw, 0) + 40) };
+
+    const sc = s.screen;
+    const showNav = ['home', 'category', 'orders', 'account'].includes(sc);
+
+    return {
+      isHome: sc === 'home', isCategory: sc === 'category', isProduct: sc === 'product', isCart: sc === 'cart', isCheckout: sc === 'checkout',
+      isPayment: sc === 'payment', isConfirmed: sc === 'confirmed', isTracking: sc === 'tracking', isOrders: sc === 'orders', isAccount: sc === 'account',
+      showNav: showNav,
+      nHome: sc === 'home' ? 'nb on' : 'nb', nShop: sc === 'category' ? 'nb on' : 'nb', nOrders: sc === 'orders' ? 'nb on' : 'nb', nAccount: sc === 'account' ? 'nb on' : 'nb',
+      goHome: go('home'), goAccount: go('account'), goCart: go('cart'), goOrders: go('orders'), goShop: go('category'),
+      goShopAll: go('category', { cat: 'all', query: '' }), goCheckout: go('checkout'), goPayment: go('payment'),
+      trackLast: () => this.setState({ screen: 'tracking', trackId: s.lastId }),
+      hasCart: lines.length > 0, cartEmpty: lines.length === 0, cartCount: lines.length,
+      hasToast: !!s.toast, toast: s.toast, toastCls: sc === 'category' ? 'toast up' : 'toast',
+      showFilter: s.filterOpen && sc === 'category', openFilter: () => this.setState({ filterOpen: true }), closeFilter: () => this.setState({ filterOpen: false }),
+      resetFilters: () => this.setState({ sort: 'rec', price: 'any', cat: 'all' }),
+      sortOpts: sortOpts, priceOpts: priceOpts, catOpts: catOpts, hasActive: activeCount > 0, activeCount: activeCount, resultLabel: 'Show ' + list.length + (list.length === 1 ? ' item' : ' items'),
+      cats: cats, today: today, list: list, tabs: tabs, noResults: list.length === 0,
+      query: s.query, onQuery: (e) => this.setState({ query: e.target.value }),
+      sp: sp, spPrice: this.fmt(spRaw.price), pqLabel: this.qlabel(s.pq), pTotal: this.fmt(spRaw.price * s.pq), cleanOpts: cleanOpts,
+      pqMinus: () => this.setState({ pq: Math.max(0.5, this.state.pq - 0.5) }),
+      pqPlus: () => this.setState({ pq: Math.min(20, this.state.pq + 0.5) }),
+      favCls: s.fav[s.sel] ? 'i fav' : 'i',
+      toggleFav: () => this.setState({ fav: { ...this.state.fav, [this.state.sel]: !this.state.fav[this.state.sel] } }),
+      addFromProduct: () => this.addToCart(this.state.sel, this.state.pq, this.state.pc, true),
+      lines: lines, subtotalL: this.fmt(subtotal), deliveryL: this.fmt(delivery), totalL: totalL,
+      clearCart: () => this.setState({ cart: [] }),
+      notes: s.notes, onNotes: (e) => this.setState({ notes: e.target.value }),
+      slots: slots, payOpts: payOpts, payLabel: s.pay === 'cod' ? 'Place order · ' + totalL : 'Pay ' + totalL,
+      placeOrder: () => this.placeOrder(),
+      ofilters: ofilters, orderCards: orderCards, noOrders: orderCards.length === 0,
+      lo: lo, to: to
+    };
+  }
+}
+</script>
+</body>
+</html>
