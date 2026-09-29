@@ -1,0 +1,143 @@
+@import 'tailwindcss';
+
+/* Design tokens – "Deep sea & brass" (docs/DESIGN_SYSTEM.md) */
+@theme {
+  --color-ink: #0a2a2f;
+  --color-ink-muted: #4f6a6c;
+  --color-ink-soft: #5e7476; /* inactive nav labels */
+  --color-cream: #f7f2e8;
+  --color-card: #fffcf6;
+  --color-line: #e6dcc8;
+  --color-line-strong: #d9ccb1;
+  --color-line-soft: #efe6d3;
+  --color-line-dashed: #b9a67c;
+  --color-rail: #c9b78f; /* stepper and timeline outlines */
+  --color-radio: #8fa1a2;
+  --color-gold: #c9a45c;
+  --color-gold-dark: #7a5c22;
+  --color-gold-soft: #f1e7d0;
+  --color-gold-ink: #5e4517;
+  --color-gold-glyph: #b08a45;
+  --color-success-soft: #dcebe6;
+  --color-success: #14574b;
+  --color-danger: #b3371a;
+  --color-backdrop: #ece4d4;
+
+  --font-serif: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-dm-sans), system-ui, sans-serif;
+
+  --radius-card: 20px;
+  --radius-tile: 18px;
+
+  --shadow-card: 0 14px 30px -22px rgba(10, 42, 47, 0.45);
+  --shadow-float: 0 16px 28px -10px rgba(10, 42, 47, 0.6);
+  --shadow-toast: 0 18px 30px -14px rgba(10, 42, 47, 0.6);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    background: var(--color-backdrop);
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-backdrop);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    letter-spacing: 0.005em;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  button {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold-dark);
+    outline-offset: 2px;
+  }
+
+  input[type='search']::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+  }
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Bottom sheet built on the native <dialog> element */
+dialog.sheet {
+  margin: auto auto 0;
+  padding: 0;
+  border: 0;
+  width: 100%;
+  max-width: 480px;
+  max-height: 84dvh;
+  background: transparent;
+  color: inherit;
+  overflow: visible;
+}
+
+dialog.sheet::backdrop {
+  background: rgba(10, 42, 47, 0.55);
+}
+
+dialog.sheet[open] > .sheet-panel {
+  animation: sheet-up 220ms ease-out;
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0.6;
+  }
+}
+
+@keyframes toast-in {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+}
+
+.animate-toast-in {
+  animation: toast-in 180ms ease-out;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #efe6d3 25%, #f7f0e2 50%, #efe6d3 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
