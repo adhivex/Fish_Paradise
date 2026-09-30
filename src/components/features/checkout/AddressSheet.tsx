@@ -5,7 +5,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/Button';
 import { OptionCard, OptionGroup } from '@/components/ui/OptionCard';
 import { addressInputSchema, formatAddress, type AddressInput } from '@/lib/address';
-import { findZone } from '@/lib/mock/catalogue';
+import { findZone } from '@/lib/mock/checkout';
 import { useAccountStore } from '@/lib/stores/account';
 
 interface AddressSheetProps {

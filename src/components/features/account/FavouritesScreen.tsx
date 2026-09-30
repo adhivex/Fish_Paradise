@@ -1,16 +1,17 @@
 'use client';
 
+import { useCatalogue } from '@/components/features/CatalogueProvider';
 import { ProductRow } from '@/components/features/ProductCards';
 import { ButtonLink } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { LoadingRegion, ProductRowSkeleton } from '@/components/ui/Skeleton';
-import { products } from '@/lib/mock/catalogue';
 import { useAccountStore } from '@/lib/stores/account';
 import { useHydrated } from '@/lib/stores/ui';
 
 export function FavouritesScreen() {
   const hydrated = useHydrated();
+  const { products } = useCatalogue();
   const favourites = useAccountStore((s) => s.favourites);
   const list = products.filter((p) => favourites.includes(p.id));
 

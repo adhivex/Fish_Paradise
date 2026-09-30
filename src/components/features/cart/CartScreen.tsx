@@ -115,7 +115,7 @@ export function CartScreen() {
                         itemName={l.product.name}
                         canDecrease={l.qtyGrams > l.product.minQtyGrams}
                         canIncrease={l.qtyGrams < maxAllowedGrams(l.product)}
-                        onStep={(d) => step(l.productId, d)}
+                        onStep={(d) => step(l.product, d)}
                       />
                     ) : (
                       <span className="text-danger mt-2 text-[13px] font-semibold">

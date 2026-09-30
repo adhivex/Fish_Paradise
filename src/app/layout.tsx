@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from 'next';
 import { DM_Sans, Fraunces } from 'next/font/google';
 import { BottomNav } from '@/components/features/BottomNav';
+import { CatalogueProvider } from '@/components/features/CatalogueProvider';
 import { StoreHydration } from '@/components/features/StoreHydration';
 import { Toast } from '@/components/ui/Toast';
+import { getCatalogue } from '@/server/services/catalogue';
 import './globals.css';
 
 const fraunces = Fraunces({
@@ -32,14 +34,17 @@ export const viewport: Viewport = {
   themeColor: '#0A2A2F',
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const catalogue = await getCatalogue();
   return (
     <html lang="en-IN" className={`${fraunces.variable} ${dmSans.variable}`}>
       <body>
         <div className="bg-cream relative mx-auto min-h-dvh max-w-[480px] shadow-[0_0_40px_-20px_rgba(10,42,47,0.35)]">
-          {children}
-          <Toast />
-          <BottomNav />
+          <CatalogueProvider catalogue={catalogue}>
+            {children}
+            <Toast />
+            <BottomNav />
+          </CatalogueProvider>
         </div>
         <StoreHydration />
       </body>

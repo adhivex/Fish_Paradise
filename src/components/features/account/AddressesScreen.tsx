@@ -8,7 +8,7 @@ import { Icon } from '@/components/ui/Icon';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { LineSkeleton, LoadingRegion } from '@/components/ui/Skeleton';
 import { formatAddress } from '@/lib/address';
-import { findZone } from '@/lib/mock/catalogue';
+import { findZone } from '@/lib/mock/checkout';
 import { useAccountStore } from '@/lib/stores/account';
 import { useOrdersStore } from '@/lib/stores/orders';
 import { useHydrated } from '@/lib/stores/ui';

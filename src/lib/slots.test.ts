@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { shopSettings, slotTemplates } from '@/lib/mock/catalogue';
+import { slotTemplates } from '@/lib/mock/checkout';
+import { fixtureCatalogue } from '@/test/fixtures';
+
+const shopSettings = fixtureCatalogue().shop;
 import { slotKey, slotLabel, slotOptions } from './slots';
 
 describe('slotOptions', () => {
@@ -30,7 +33,7 @@ describe('slotOptions', () => {
   it('builds stable keys and labels', () => {
     const options = slotOptions(new Date(2026, 8, 30, 10, 0), shopSettings, slotTemplates);
     expect(slotKey(options[0]!.choice)).toBe('asap');
-    expect(slotKey(options[3]!.choice)).toBe('slot_evening:2026-09-30');
+    expect(slotKey(options[3]!.choice)).toBe('slot_1700:2026-09-30');
     expect(slotLabel(options[0]!)).toBe('ASAP · 30 – 60 mins');
     expect(slotLabel(options[3]!)).toBe('Today, 5:00 – 6:00 PM');
   });

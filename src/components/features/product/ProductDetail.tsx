@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useCatalogue } from '@/components/features/CatalogueProvider';
 import { Button } from '@/components/ui/Button';
 import { Eyebrow, InfoBadge } from '@/components/ui/Card';
 import { Icon } from '@/components/ui/Icon';
@@ -10,7 +11,6 @@ import { OptionCard, OptionGroup } from '@/components/ui/OptionCard';
 import { StickyDock } from '@/components/ui/PageHeader';
 import { ProductImage } from '@/components/ui/ProductImage';
 import { QuantityStepper } from '@/components/ui/QuantityStepper';
-import { cleaningOptions, defaultCleaningOption, shopSettings } from '@/lib/mock/catalogue';
 import { formatMoney } from '@/lib/money';
 import { lineTotalPaise } from '@/lib/pricing';
 import { clampQty, maxAllowedGrams, stepQty } from '@/lib/qty';
@@ -24,8 +24,9 @@ const DEFAULT_GRAMS = 1000;
 export function ProductDetail({ product }: { product: ProductDTO }) {
   const router = useRouter();
   const hydrated = useHydrated();
+  const { cleaningOptions, defaultCleaning, shop } = useCatalogue();
   const [grams, setGrams] = useState(() => clampQty(DEFAULT_GRAMS, product));
-  const [cleaningId, setCleaningId] = useState(defaultCleaningOption().id);
+  const [cleaningId, setCleaningId] = useState(defaultCleaning?.id ?? '');
   const [customNote, setCustomNote] = useState('');
   const add = useCartStore((s) => s.add);
   const isFav = useAccountStore((s) => s.favourites.includes(product.id));
@@ -37,8 +38,8 @@ export function ProductDetail({ product }: { product: ProductDTO }) {
   const total = lineTotalPaise(product.pricePerKgPaise, grams, cleaning?.extraPaise ?? 0);
 
   function addToCart() {
-    if (soldOut || needsNote) return;
-    add({ productId: product.id, qtyGrams: grams, cleaningOptionId: cleaningId });
+    if (soldOut || needsNote || !cleaning) return;
+    add({ productId: product.id, qtyGrams: grams, cleaningOptionId: cleaning.id }, product);
     if (cleaning?.requiresNote) {
       // Line notes join the order instructions until per-line notes arrive with the server cart.
       const notes = useCartStore.getState().notes;
@@ -142,7 +143,7 @@ export function ProductDetail({ product }: { product: ProductDTO }) {
           <Icon name="truck" size={28} className="text-gold" />
           <div>
             <b className="block text-[15px]">
-              Today · {shopSettings.asapMinMinutes} – {shopSettings.asapMaxMinutes} mins
+              Today · {shop.asapMinMinutes} – {shop.asapMaxMinutes} mins
             </b>
             <span className="text-cream/80 block text-[13px]">Freshly cleaned and packed</span>
           </div>

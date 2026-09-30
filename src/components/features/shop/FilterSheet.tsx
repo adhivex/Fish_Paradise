@@ -5,25 +5,26 @@ import { Button } from '@/components/ui/Button';
 import { OptionCard, OptionGroup } from '@/components/ui/OptionCard';
 import { TextButton } from '@/components/ui/TextLink';
 import { SORT_OPTIONS, type PriceBand, type ProductFilter, type SortKey } from '@/lib/filters';
-import { categories } from '@/lib/mock/catalogue';
+import type { CategoryDTO } from '@/lib/types';
 
 interface FilterSheetProps {
   open: boolean;
   onClose: () => void;
   filter: ProductFilter;
   bands: PriceBand[];
-  resultCount: number;
+  categories: CategoryDTO[];
+  /** null while the server is applying a change. */
+  resultCount: number | null;
   onChange: (patch: Partial<ProductFilter>) => void;
   onReset: () => void;
 }
-
-const CATEGORY_OPTIONS = [{ slug: 'all', name: 'All' }, ...categories];
 
 export function FilterSheet({
   open,
   onClose,
   filter,
   bands,
+  categories,
   resultCount,
   onChange,
   onReset,
@@ -36,7 +37,7 @@ export function FilterSheet({
       headerAction={<TextButton onClick={onReset}>Reset</TextButton>}
       footer={
         <Button onClick={onClose}>
-          Show {resultCount} {resultCount === 1 ? 'item' : 'items'}
+          {resultCount === null ? 'Updating…' : `Show ${resultCount} ${resultCount === 1 ? 'item' : 'items'}`}
         </Button>
       }
     >
@@ -65,7 +66,7 @@ export function FilterSheet({
         ))}
       </OptionGroup>
       <OptionGroup label="Category" className="mt-[18px]">
-        {CATEGORY_OPTIONS.map((c) => (
+        {[{ slug: 'all', name: 'All' }, ...categories].map((c) => (
           <OptionCard
             key={c.slug}
             name="category"

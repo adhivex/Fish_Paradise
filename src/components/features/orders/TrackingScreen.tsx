@@ -1,6 +1,7 @@
 'use client';
 
 import { SummaryLines } from '@/components/features/checkout/SummaryLines';
+import { useCatalogue } from '@/components/features/CatalogueProvider';
 import { Button, ButtonLink } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -8,13 +9,13 @@ import { Icon } from '@/components/ui/Icon';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { LineSkeleton, LoadingRegion, Skeleton } from '@/components/ui/Skeleton';
 import { Timeline } from '@/components/ui/Timeline';
-import { shopSettings } from '@/lib/mock/catalogue';
 import { formatMoney } from '@/lib/money';
 import { buildTimeline, statusHeadline } from '@/lib/orders';
 import { useOrder } from './useOrder';
 
 export function TrackingScreen({ orderNumber }: { orderNumber: string }) {
   const { loading, order } = useOrder(orderNumber);
+  const { shop } = useCatalogue();
   const header = (
     <PageHeader title={`Order #${orderNumber}`} backHref="/orders" backLabel="Back to my orders" />
   );
@@ -60,7 +61,7 @@ export function TrackingScreen({ orderNumber }: { orderNumber: string }) {
 
   const { headline, subline } = statusHeadline(order.status);
   const paid = order.paymentStatus === 'PAID' || order.paymentStatus === 'COD_COLLECTED';
-  const phone = shopSettings.phone;
+  const phone = shop.phone;
 
   return (
     <main className="flex min-h-dvh flex-col pb-[env(safe-area-inset-bottom)]">

@@ -3,14 +3,15 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { addLine, type CartLine } from '@/lib/cart';
-import { getProductById } from '@/lib/mock/catalogue';
 import { clampQty, stepQty } from '@/lib/qty';
+import type { ProductDTO } from '@/lib/types';
 
 interface CartState {
   lines: CartLine[];
   notes: string;
-  add: (line: CartLine) => void;
-  step: (productId: string, direction: 1 | -1) => void;
+  /** `product` supplies availability and quantity rules; prices are never stored in the cart. */
+  add: (line: CartLine, product: ProductDTO) => void;
+  step: (product: ProductDTO, direction: 1 | -1) => void;
   remove: (productId: string) => void;
   clear: () => void;
   setNotes: (notes: string) => void;
@@ -22,20 +23,15 @@ export const useCartStore = create<CartState>()(
     (set) => ({
       lines: [],
       notes: '',
-      add: (line) =>
-        set((s) => {
-          const product = getProductById(line.productId);
-          if (!product || !product.todayAvailable) return s;
-          return { lines: addLine(s.lines, line, product) };
-        }),
-      step: (productId, direction) =>
+      add: (line, product) =>
+        set((s) => (product.todayAvailable ? { lines: addLine(s.lines, line, product) } : s)),
+      step: (product, direction) =>
         set((s) => ({
-          lines: s.lines.map((l) => {
-            const product = getProductById(l.productId);
-            return l.productId === productId && product
+          lines: s.lines.map((l) =>
+            l.productId === product.id
               ? { ...l, qtyGrams: stepQty(clampQty(l.qtyGrams, product), direction, product) }
-              : l;
-          }),
+              : l,
+          ),
         })),
       remove: (productId) => set((s) => ({ lines: s.lines.filter((l) => l.productId !== productId) })),
       clear: () => set({ lines: [], notes: '' }),
@@ -43,7 +39,9 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: 'fp-cart',
-      version: 1,
+      // v2: product ids now come from the database; v1 carts held mock ids and are dropped.
+      version: 2,
+      migrate: () => ({ lines: [], notes: '' }),
       storage: createJSONStorage(() => localStorage),
       skipHydration: true,
     },

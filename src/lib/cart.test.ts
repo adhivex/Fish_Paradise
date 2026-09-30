@@ -1,34 +1,35 @@
 import { describe, expect, it } from 'vitest';
-import { cleaningOptions, getProduct, getProductById } from '@/lib/mock/catalogue';
+import { fixtureCatalogue } from '@/test/fixtures';
 import { addLine, priceCart } from './cart';
 
-const pomfret = getProduct('pomfret')!;
-const crab = getProduct('crab')!;
-const catalogue = { product: getProductById, cleaning: cleaningOptions };
+const { products, cleaningOptions } = fixtureCatalogue();
+const pomfret = products.find((p) => p.slug === 'pomfret')!;
+const crab = products.find((p) => p.slug === 'crab')!;
+const catalogue = { product: (id: string) => products.find((p) => p.id === id), cleaning: cleaningOptions };
 const rule = { deliveryFeePaise: 4000, freeAbovePaise: null };
 
 describe('addLine', () => {
   it('appends new products', () => {
     const lines = addLine(
       [],
-      { productId: pomfret.id, qtyGrams: 1000, cleaningOptionId: 'clean_whole' },
+      { productId: pomfret.id, qtyGrams: 1000, cleaningOptionId: 'clean_1' },
       pomfret,
     );
-    expect(lines).toEqual([{ productId: pomfret.id, qtyGrams: 1000, cleaningOptionId: 'clean_whole' }]);
+    expect(lines).toEqual([{ productId: pomfret.id, qtyGrams: 1000, cleaningOptionId: 'clean_1' }]);
   });
 
   it('adds grams and replaces the cleaning option for the same product', () => {
-    const start = [{ productId: pomfret.id, qtyGrams: 1000, cleaningOptionId: 'clean_whole' }];
+    const start = [{ productId: pomfret.id, qtyGrams: 1000, cleaningOptionId: 'clean_1' }];
     const lines = addLine(
       start,
-      { productId: pomfret.id, qtyGrams: 500, cleaningOptionId: 'clean_fry' },
+      { productId: pomfret.id, qtyGrams: 500, cleaningOptionId: 'clean_3' },
       pomfret,
     );
-    expect(lines).toEqual([{ productId: pomfret.id, qtyGrams: 1500, cleaningOptionId: 'clean_fry' }]);
+    expect(lines).toEqual([{ productId: pomfret.id, qtyGrams: 1500, cleaningOptionId: 'clean_3' }]);
   });
 
   it('never exceeds the product maximum', () => {
-    const start = [{ productId: pomfret.id, qtyGrams: 20000, cleaningOptionId: 'clean_whole' }];
+    const start = [{ productId: pomfret.id, qtyGrams: 20000, cleaningOptionId: 'clean_1' }];
     expect(addLine(start, { ...start[0]!, qtyGrams: 500 }, pomfret)[0]!.qtyGrams).toBe(20000);
   });
 });
@@ -37,8 +38,8 @@ describe('priceCart', () => {
   it('prices lines and totals from the catalogue', () => {
     const cart = priceCart(
       [
-        { productId: pomfret.id, qtyGrams: 1000, cleaningOptionId: 'clean_whole' },
-        { productId: crab.id, qtyGrams: 1500, cleaningOptionId: 'clean_curry' },
+        { productId: pomfret.id, qtyGrams: 1000, cleaningOptionId: 'clean_1' },
+        { productId: crab.id, qtyGrams: 1500, cleaningOptionId: 'clean_2' },
       ],
       catalogue,
       rule,
@@ -58,7 +59,7 @@ describe('priceCart', () => {
   it('excludes sold-out lines from totals and flags them', () => {
     const soldOut = { ...crab, todayAvailable: false };
     const cart = priceCart(
-      [{ productId: crab.id, qtyGrams: 500, cleaningOptionId: 'clean_whole' }],
+      [{ productId: crab.id, qtyGrams: 500, cleaningOptionId: 'clean_1' }],
       { product: () => soldOut, cleaning: cleaningOptions },
       rule,
     );

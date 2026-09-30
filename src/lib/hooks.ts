@@ -1,14 +1,9 @@
 'use client';
 
 import { useMemo } from 'react';
+import { useCatalogue } from '@/components/features/CatalogueProvider';
 import { priceCart, type PricedCart } from '@/lib/cart';
-import {
-  cleaningOptions,
-  deliveryZones,
-  defaultCleaningOption,
-  findZone,
-  getProductById,
-} from '@/lib/mock/catalogue';
+import { deliveryZones, findZone } from '@/lib/mock/checkout';
 import { useAccountStore } from '@/lib/stores/account';
 import { useCartStore } from '@/lib/stores/cart';
 import { useOrdersStore } from '@/lib/stores/orders';
@@ -36,16 +31,17 @@ export function useDeliveryZone(): { address: AddressDTO | undefined; zone: Deli
 }
 
 /**
- * Cart priced from the (mock) catalogue. Phase 4 replaces this with server totals from
+ * Cart priced from the database catalogue. Phase 4 replaces this with server totals from
  * `GET /api/cart`; components only read the result.
  */
 export function usePricedCart(): PricedCart {
   const lines = useCartStore((s) => s.lines);
+  const { productById, cleaningOptions } = useCatalogue();
   const { zone } = useDeliveryZone();
   const rule = zone ?? deliveryZones[0]!;
   return useMemo(
-    () => priceCart(lines, { product: getProductById, cleaning: cleaningOptions }, rule),
-    [lines, rule],
+    () => priceCart(lines, { product: productById, cleaning: cleaningOptions }, rule),
+    [lines, productById, cleaningOptions, rule],
   );
 }
 
@@ -55,9 +51,10 @@ const QUICK_ADD_GRAMS = 1000;
 export function useQuickAdd(): (product: ProductDTO) => void {
   const add = useCartStore((s) => s.add);
   const showToast = useUiStore((s) => s.showToast);
+  const { defaultCleaning } = useCatalogue();
   return (product) => {
-    if (!product.todayAvailable) return;
-    add({ productId: product.id, qtyGrams: QUICK_ADD_GRAMS, cleaningOptionId: defaultCleaningOption().id });
+    if (!product.todayAvailable || !defaultCleaning) return;
+    add({ productId: product.id, qtyGrams: QUICK_ADD_GRAMS, cleaningOptionId: defaultCleaning.id }, product);
     showToast(`${product.name} added to cart`, 'cart');
   };
 }

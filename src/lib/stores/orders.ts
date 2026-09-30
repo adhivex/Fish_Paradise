@@ -4,7 +4,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { rupees } from '@/lib/money';
 import { orderNumberFromSeq } from '@/lib/orders';
-import { sampleAddresses } from '@/lib/mock/catalogue';
+import { sampleAddresses } from '@/lib/mock/checkout';
 import type { OrderDTO, PaymentMethod, SlotChoice } from '@/lib/types';
 
 /** Two delivered orders from the approved design so My orders is not empty on first run. */

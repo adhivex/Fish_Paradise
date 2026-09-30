@@ -10,7 +10,8 @@ import { PageHeader, StickyDock } from '@/components/ui/PageHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { TextLink } from '@/components/ui/TextLink';
 import { useDeliveryZone, usePricedCart } from '@/lib/hooks';
-import { shopSettings, slotTemplates } from '@/lib/mock/catalogue';
+import { useCatalogue } from '@/components/features/CatalogueProvider';
+import { slotTemplates } from '@/lib/mock/checkout';
 import { formatMoney } from '@/lib/money';
 import { slotKey, slotLabel, slotOptions } from '@/lib/slots';
 import { useCartStore } from '@/lib/stores/cart';
@@ -28,6 +29,7 @@ const METHODS: ReadonlyArray<{ value: PaymentMethod; title: string; subtitle: st
 export function PaymentScreen() {
   const router = useRouter();
   const hydrated = useHydrated();
+  const { shop } = useCatalogue();
   const cart = usePricedCart();
   const { address, zone } = useDeliveryZone();
   const notes = useCartStore((s) => s.notes);
@@ -35,7 +37,9 @@ export function PaymentScreen() {
   const draft = useOrdersStore((s) => s.draft);
   const setDraft = useOrdersStore((s) => s.setDraft);
   const placeOrder = useOrdersStore((s) => s.placeOrder);
-  const [busy, setBusy] = useState(false);
+  // Holds the total shown while the order is placed, so clearing the cart does not flash ₹0.
+  const [placedTotal, setPlacedTotal] = useState<string | null>(null);
+  const busy = placedTotal !== null;
   const placing = useRef(false);
 
   useEffect(() => {
@@ -44,19 +48,19 @@ export function PaymentScreen() {
     else if (!address || !zone || cart.hasUnavailable) router.replace('/checkout');
   }, [hydrated, cart.lines.length, cart.hasUnavailable, address, zone, router]);
 
-  const total = formatMoney(cart.totals.totalPaise);
+  const total = placedTotal ?? formatMoney(cart.totals.totalPaise);
   const isCod = draft.paymentMethod === 'COD';
 
   async function pay() {
     if (!address || busy) return;
-    const slot = slotOptions(new Date(), shopSettings, slotTemplates).find(
+    const slot = slotOptions(new Date(), shop, slotTemplates).find(
       (o) => o.key === slotKey(draft.slot) && !o.disabled,
     );
     if (!slot) {
       router.replace('/checkout');
       return;
     }
-    setBusy(true);
+    setPlacedTotal(total);
     placing.current = true;
     // MOCK: online payments go through Razorpay Checkout + webhook in Phase 5. Here we simulate
     // a successful payment; COD is auto-confirmed per ShopSettings.autoConfirmCod.

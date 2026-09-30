@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import { ShopScreen } from '@/components/features/shop/ShopScreen';
-import { categories } from '@/lib/mock/catalogue';
+import { parseSearchParams } from '@/lib/api';
+import { queryCatalogue } from '@/lib/catalogue';
+import { catalogueQuerySchema } from '@/lib/validation';
+import { getCatalogue } from '@/server/services/catalogue';
 
 export const metadata: Metadata = { title: 'Shop seafood' };
 
@@ -9,9 +12,16 @@ export default async function ShopPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const params = await searchParams;
-  const raw = typeof params.category === 'string' ? params.category : 'all';
-  const category = categories.some((c) => c.slug === raw) ? raw : 'all';
-  const query = typeof params.q === 'string' ? params.q.slice(0, 60) : '';
-  return <ShopScreen key={`${category}:${query}`} initialCategory={category} initialQuery={query} />;
+  const parsed = parseSearchParams(catalogueQuerySchema, await searchParams);
+  const catalogue = await getCatalogue();
+  // Invalid params fall back to the unfiltered list instead of an error page.
+  const result = queryCatalogue(catalogue, parsed.success ? parsed.data : {});
+  return (
+    <ShopScreen
+      filter={result.filter}
+      products={result.products}
+      priceBands={result.priceBands}
+      categories={catalogue.categories}
+    />
+  );
 }

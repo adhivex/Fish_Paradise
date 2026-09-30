@@ -11,7 +11,8 @@ import { LineSkeleton, LoadingRegion } from '@/components/ui/Skeleton';
 import { TextButton } from '@/components/ui/TextLink';
 import { formatAddress } from '@/lib/address';
 import { useDeliveryZone, usePricedCart } from '@/lib/hooks';
-import { shopSettings, slotTemplates } from '@/lib/mock/catalogue';
+import { useCatalogue } from '@/components/features/CatalogueProvider';
+import { slotTemplates } from '@/lib/mock/checkout';
 import { formatMoney } from '@/lib/money';
 import { slotKey, slotOptions } from '@/lib/slots';
 import { useOrdersStore } from '@/lib/stores/orders';
@@ -23,6 +24,7 @@ import { SummaryLines } from './SummaryLines';
 export function CheckoutScreen() {
   const router = useRouter();
   const hydrated = useHydrated();
+  const { shop } = useCatalogue();
   const cart = usePricedCart();
   const { address, zone } = useDeliveryZone();
   const draft = useOrdersStore((s) => s.draft);
@@ -38,8 +40,8 @@ export function CheckoutScreen() {
   const closeSheet = useCallback(() => setSheet((s) => ({ ...s, open: false })), []);
 
   const options = useMemo(
-    () => (hydrated ? slotOptions(new Date(), shopSettings, slotTemplates) : []),
-    [hydrated],
+    () => (hydrated ? slotOptions(new Date(), shop, slotTemplates) : []),
+    [hydrated, shop],
   );
   const selectedKey = slotKey(draft.slot);
   const selectedOption = options.find((o) => o.key === selectedKey && !o.disabled);

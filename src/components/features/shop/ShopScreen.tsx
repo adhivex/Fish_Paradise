@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useOptimistic, useRef, useState, useTransition } from 'react';
 import { CartButton } from '@/components/features/CartButton';
 import { ProductRow } from '@/components/features/ProductCards';
 import { Badge } from '@/components/ui/Card';
@@ -9,45 +10,61 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { Icon } from '@/components/ui/Icon';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { SearchInput } from '@/components/ui/SearchInput';
-import { activeFilterCount, buildPriceBands, filterProducts, type ProductFilter } from '@/lib/filters';
-import { categories, products, shopSettings } from '@/lib/mock/catalogue';
+import { cn } from '@/lib/cn';
+import { activeFilterCount, filterToHref, type PriceBand, type ProductFilter } from '@/lib/filters';
+import type { CategoryDTO, ProductDTO } from '@/lib/types';
 import { FilterSheet } from './FilterSheet';
 
-const TABS = [{ slug: 'all', name: 'All' }, ...categories];
+const SEARCH_DEBOUNCE_MS = 300;
 
-export function ShopScreen({
-  initialCategory,
-  initialQuery,
-}: {
-  initialCategory: string;
-  initialQuery: string;
-}) {
-  const [filter, setFilter] = useState<ProductFilter>({
-    category: initialCategory,
-    query: initialQuery,
-    sort: 'rec',
-    priceBand: 'any',
-  });
+interface ShopScreenProps {
+  /** Filter the server applied (from the URL). */
+  filter: ProductFilter;
+  products: ProductDTO[];
+  priceBands: PriceBand[];
+  categories: CategoryDTO[];
+}
+
+/**
+ * The URL is the source of truth: every change navigates to a new `/shop?…` URL and the server
+ * returns the filtered list. `useOptimistic` keeps chips and options responsive meanwhile.
+ */
+export function ShopScreen({ filter, products, priceBands, categories }: ShopScreenProps) {
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+  const [optimistic, setOptimistic] = useOptimistic(filter);
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const bands = useMemo(() => buildPriceBands(shopSettings.priceBandsPaise), []);
-  const list = useMemo(() => filterProducts(products, filter, bands), [filter, bands]);
-  const active = activeFilterCount(filter);
+  // Search text is local while typing and follows the URL when it changes elsewhere.
+  const [text, setText] = useState(filter.query);
+  const [urlQuery, setUrlQuery] = useState(filter.query);
+  if (filter.query !== urlQuery) {
+    setUrlQuery(filter.query);
+    if (filter.query !== text.trim()) setText(filter.query);
+  }
 
-  const update = useCallback((patch: Partial<ProductFilter>) => {
-    setFilter((f) => {
-      const next = { ...f, ...patch };
-      // Keep category and search in the URL so refresh / share / back keep the view.
-      const params = new URLSearchParams();
-      if (next.category !== 'all') params.set('category', next.category);
-      if (next.query) params.set('q', next.query);
-      const qs = params.toString();
-      window.history.replaceState(null, '', qs ? `/shop?${qs}` : '/shop');
-      return next;
-    });
-  }, []);
+  const update = useCallback(
+    (patch: Partial<ProductFilter>) => {
+      const next = { ...optimistic, ...patch };
+      startTransition(() => {
+        setOptimistic(next);
+        router.replace(filterToHref(next), { scroll: false });
+      });
+    },
+    [optimistic, router, setOptimistic],
+  );
+
+  const debounce = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(debounce.current), []);
+  const onSearch = (value: string) => {
+    setText(value);
+    clearTimeout(debounce.current);
+    debounce.current = setTimeout(() => update({ query: value }), SEARCH_DEBOUNCE_MS);
+  };
 
   const closeSheet = useCallback(() => setSheetOpen(false), []);
+  const active = activeFilterCount(optimistic);
+  const tabs = [{ slug: 'all', name: 'All' }, ...categories];
 
   return (
     <main className="pb-[calc(160px+env(safe-area-inset-bottom))]">
@@ -62,14 +79,14 @@ export function ShopScreen({
         <SearchInput
           label="Search seafood"
           placeholder="Search fish, prawns, crab"
-          value={filter.query}
-          onChange={(query) => update({ query })}
+          value={text}
+          onChange={onSearch}
         />
         <ChipRow label="Categories">
-          {TABS.map((t) => (
+          {tabs.map((t) => (
             <Chip
               key={t.slug}
-              selected={filter.category === t.slug}
+              selected={optimistic.category === t.slug}
               onClick={() => update({ category: t.slug })}
             >
               {t.name}
@@ -79,18 +96,22 @@ export function ShopScreen({
       </div>
 
       <p className="sr-only" aria-live="polite">
-        {list.length} {list.length === 1 ? 'item' : 'items'} shown
+        {pending
+          ? 'Updating results'
+          : `${products.length} ${products.length === 1 ? 'item' : 'items'} shown`}
       </p>
 
-      {list.length > 0 ? (
-        <ul className="m-0 list-none p-0">
-          {list.map((p) => (
-            <ProductRow key={p.id} product={p} />
-          ))}
-        </ul>
-      ) : (
-        <EmptyState title="Nothing found" body="Try a different name or pick another category." />
-      )}
+      <div aria-busy={pending} className={cn('transition-opacity duration-150', pending && 'opacity-60')}>
+        {products.length > 0 ? (
+          <ul className="m-0 list-none p-0">
+            {products.map((p) => (
+              <ProductRow key={p.id} product={p} />
+            ))}
+          </ul>
+        ) : (
+          <EmptyState title="Nothing found" body="Try a different name or pick another category." />
+        )}
+      </div>
 
       <button
         type="button"
@@ -107,9 +128,10 @@ export function ShopScreen({
       <FilterSheet
         open={sheetOpen}
         onClose={closeSheet}
-        filter={filter}
-        bands={bands}
-        resultCount={list.length}
+        filter={optimistic}
+        bands={priceBands}
+        categories={categories}
+        resultCount={pending ? null : products.length}
         onChange={update}
         onReset={() => update({ sort: 'rec', priceBand: 'any', category: 'all' })}
       />

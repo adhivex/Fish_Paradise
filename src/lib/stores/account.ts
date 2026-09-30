@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { sampleAddresses, sampleCustomer } from '@/lib/mock/catalogue';
+import { sampleAddresses, sampleCustomer } from '@/lib/mock/checkout';
 import type { AddressDTO } from '@/lib/types';
 
 interface Customer {
@@ -48,7 +48,9 @@ export const useAccountStore = create<AccountState>()(
     }),
     {
       name: 'fp-account',
-      version: 1,
+      // v2: favourites hold database product ids; v1 held mock ids.
+      version: 2,
+      migrate: (persisted) => ({ ...(persisted as AccountState), favourites: [] }),
       storage: createJSONStorage(() => localStorage),
       skipHydration: true,
     },

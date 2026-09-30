@@ -7,14 +7,9 @@ import { IconLink } from '@/components/ui/IconButton';
 import { SectionHeader } from '@/components/ui/PageHeader';
 import { ProductImage } from '@/components/ui/ProductImage';
 import { TextLink } from '@/components/ui/TextLink';
-import {
-  categories,
-  categoryCover,
-  featuredOrder,
-  getProduct,
-  products,
-  shopSettings,
-} from '@/lib/mock/catalogue';
+import { categoryCover, featuredProducts } from '@/lib/catalogue';
+import type { ShopSettingsDTO } from '@/lib/types';
+import { getCatalogue } from '@/server/services/catalogue';
 
 const FEATURES: ReadonlyArray<{ icon: IconName; label: string }> = [
   { icon: 'fish', label: 'Fresh catch daily' },
@@ -25,7 +20,7 @@ const FEATURES: ReadonlyArray<{ icon: IconName; label: string }> = [
 
 const FISH_PATH = 'M2 20C12 6 30 4 46 16l16-10v28L46 24C30 36 12 34 2 20z';
 
-function Hero() {
+function Hero({ shop }: { shop: ShopSettingsDTO }) {
   return (
     <section className="bg-ink text-cream relative overflow-hidden rounded-b-[34px] pt-1.5 pb-[60px]">
       <svg
@@ -75,7 +70,7 @@ function Hero() {
               <path d={FISH_PATH} fill="#0A2A2F" />
             </svg>
           </span>
-          <span className="font-serif">{shopSettings.shopName}</span>
+          <span className="font-serif">{shop.shopName}</span>
         </div>
         <CartButton className="text-white hover:bg-white/10" />
       </div>
@@ -85,7 +80,8 @@ function Hero() {
         className="border-gold/45 text-cream relative z-[1] mx-4 mt-1 inline-flex h-11 items-center gap-2 rounded-full border px-4 text-sm font-medium hover:bg-white/5"
       >
         <Icon name="pin" className="text-gold" />
-        Deliver to {shopSettings.cityLabel}
+        {/* PLACEHOLDER: deliveryCity is the sample city from the design (ShopSettings). */}
+        {shop.deliveryCity ? `Deliver to ${shop.deliveryCity}` : 'Choose delivery address'}
         <Icon name="chevronDown" className="text-gold" />
       </Link>
 
@@ -113,14 +109,13 @@ function Hero() {
   );
 }
 
-export default function HomePage() {
-  const featured = featuredOrder
-    .map((slug) => products.find((p) => p.slug === slug && p.isFeatured))
-    .filter((p) => p !== undefined);
+export default async function HomePage() {
+  const catalogue = await getCatalogue();
+  const featured = featuredProducts(catalogue);
 
   return (
     <main className="pb-[calc(96px+env(safe-area-inset-bottom))]">
-      <Hero />
+      <Hero shop={catalogue.shop} />
 
       <Card className="relative z-[2] mx-4 -mt-8 grid grid-cols-4 px-1 py-4">
         <h2 className="sr-only">Why Fish Paradise</h2>
@@ -148,8 +143,8 @@ export default function HomePage() {
           }
         />
         <ul className="m-0 grid list-none grid-cols-3 gap-2.5 px-4">
-          {categories.map((c) => {
-            const cover = getProduct(categoryCover[c.slug] ?? '');
+          {catalogue.categories.map((c) => {
+            const cover = categoryCover(catalogue, c.slug);
             return (
               <li key={c.id}>
                 <Link
