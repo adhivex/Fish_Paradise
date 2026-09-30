@@ -6,7 +6,10 @@ const baseURL = `http://localhost:${PORT}`;
 
 export default defineConfig({
   testDir: './e2e',
+  globalSetup: './e2e/global-setup.ts',
+  timeout: 90_000,
   fullyParallel: true,
+  workers: process.env.CI ? 2 : 3,
   retries: process.env.CI ? 2 : 0,
   // The dev server compiles each route on first visit, which can take several seconds.
   expect: { timeout: 20_000 },

@@ -31,6 +31,8 @@ export function BottomNav() {
           <Link
             key={item.href}
             href={item.href}
+            // Login-protected pages would only prefetch a redirect.
+            prefetch={item.href === '/orders' ? false : undefined}
             aria-current={active ? 'page' : undefined}
             className={cn(
               'flex min-h-[54px] flex-1 flex-col items-center justify-center gap-0.5 text-xs font-semibold tracking-[0.02em]',

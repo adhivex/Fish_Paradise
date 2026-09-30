@@ -1,23 +1,28 @@
 'use client';
 
 import { useState } from 'react';
+import useSWR from 'swr';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/Button';
 import { OptionCard, OptionGroup } from '@/components/ui/OptionCard';
 import { addressInputSchema, formatAddress, type AddressInput } from '@/lib/address';
-import { findZone } from '@/lib/mock/checkout';
-import { useAccountStore } from '@/lib/stores/account';
+import { api, ClientApiError, fetcher } from '@/lib/client/api';
+import type { ClientAddress } from '@/lib/client/data';
 
 interface AddressSheetProps {
   open: boolean;
   onClose: () => void;
+  addresses: ClientAddress[];
   selectedId: string | undefined;
   onSelect: (id: string) => void;
+  /** Called after a new address is saved (to refresh the list). */
+  onSaved: (address: ClientAddress) => void;
   startInForm?: boolean;
 }
 
 type FieldErrors = Partial<Record<keyof AddressInput, string>>;
 
+// PLACEHOLDER defaults from the design's sample city.
 const EMPTY: AddressInput = {
   label: 'Home',
   line1: '',
@@ -71,25 +76,38 @@ function Field({
   );
 }
 
+interface PincodeCheck {
+  serviceable: boolean;
+  areaName: string | null;
+}
+
 export function AddressSheet({
   open,
   onClose,
+  addresses,
   selectedId,
   onSelect,
+  onSaved,
   startInForm = false,
 }: AddressSheetProps) {
-  const addresses = useAccountStore((s) => s.addresses);
-  const addAddress = useAccountStore((s) => s.addAddress);
-  const [mode, setMode] = useState<'list' | 'form'>(startInForm ? 'form' : 'list');
+  const [mode, setMode] = useState<'list' | 'form'>(startInForm || addresses.length === 0 ? 'form' : 'list');
   const [form, setForm] = useState<AddressInput>(EMPTY);
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  const pinReady = /^[1-9]\d{5}$/.test(form.pincode);
+  const { data: pin } = useSWR<PincodeCheck>(
+    pinReady ? `/api/delivery/check?pincode=${form.pincode}` : null,
+    fetcher,
+  );
 
   const set = (name: keyof AddressInput, value: string) => {
     setForm((f) => ({ ...f, [name]: value }));
     setErrors((e) => ({ ...e, [name]: undefined }));
   };
 
-  function save() {
+  async function save() {
     const parsed = addressInputSchema.safeParse(form);
     if (!parsed.success) {
       const next: FieldErrors = {};
@@ -100,18 +118,21 @@ export function AddressSheet({
       setErrors(next);
       return;
     }
-    const created = addAddress({
-      ...parsed.data,
-      area: parsed.data.area || undefined,
-      landmark: parsed.data.landmark || undefined,
-    });
-    onSelect(created.id);
-    setForm(EMPTY);
-    setMode('list');
-    onClose();
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const { address } = await api<{ address: ClientAddress }>('/api/addresses', { body: parsed.data });
+      onSaved(address);
+      onSelect(address.id);
+      setForm(EMPTY);
+      setMode('list');
+      onClose();
+    } catch (e) {
+      setSaveError(e instanceof ClientApiError ? e.message : 'Could not save the address.');
+    } finally {
+      setSaving(false);
+    }
   }
-
-  const pinServiceable = /^\d{6}$/.test(form.pincode) ? !!findZone(form.pincode) : null;
 
   return (
     <BottomSheet
@@ -125,11 +146,13 @@ export function AddressSheet({
           </Button>
         ) : (
           <div className="flex gap-2.5">
-            <Button variant="outline" onClick={() => setMode('list')} className="flex-1">
-              Back
-            </Button>
-            <Button onClick={save} className="flex-[2]">
-              Save address
+            {addresses.length > 0 && (
+              <Button variant="outline" onClick={() => setMode('list')} className="flex-1">
+                Back
+              </Button>
+            )}
+            <Button onClick={() => void save()} disabled={saving} className="flex-[2]">
+              {saving ? 'Saving…' : 'Save address'}
             </Button>
           </div>
         )
@@ -137,33 +160,30 @@ export function AddressSheet({
     >
       {mode === 'list' ? (
         <OptionGroup label="Saved addresses" showLabel={false} columns={1} className="mt-3">
-          {addresses.map((a) => {
-            const serviceable = !!findZone(a.pincode);
-            return (
-              <OptionCard
-                key={a.id}
-                size="lg"
-                name="address"
-                value={a.id}
-                checked={a.id === selectedId}
-                onSelect={(id) => {
-                  onSelect(id);
-                  onClose();
-                }}
-                title={a.label}
-                subtitle={
-                  <>
-                    {formatAddress(a)}
-                    {!serviceable && (
-                      <span className="text-danger mt-0.5 block font-semibold">
-                        We don&apos;t deliver here yet
-                      </span>
-                    )}
-                  </>
-                }
-              />
-            );
-          })}
+          {addresses.map((a) => (
+            <OptionCard
+              key={a.id}
+              size="lg"
+              name="address"
+              value={a.id}
+              checked={a.id === selectedId}
+              onSelect={(id) => {
+                onSelect(id);
+                onClose();
+              }}
+              title={a.label}
+              subtitle={
+                <>
+                  {formatAddress(a)}
+                  {!a.serviceable && (
+                    <span className="text-danger mt-0.5 block font-semibold">
+                      We don&apos;t deliver here yet
+                    </span>
+                  )}
+                </>
+              }
+            />
+          ))}
         </OptionGroup>
       ) : (
         <form
@@ -171,7 +191,7 @@ export function AddressSheet({
           noValidate
           onSubmit={(e) => {
             e.preventDefault();
-            save();
+            void save();
           }}
         >
           <OptionGroup label="Save as" className="mb-4" columns={2}>
@@ -221,7 +241,7 @@ export function AddressSheet({
               autoComplete="postal-code"
             />
           </div>
-          {pinServiceable === false && (
+          {pinReady && pin?.serviceable === false && (
             <p
               role="alert"
               className="text-danger mt-0 mb-2 rounded-xl bg-[#FBEDE8] px-3 py-2.5 text-[13px] font-semibold"
@@ -230,9 +250,14 @@ export function AddressSheet({
               serviceable pincode.
             </p>
           )}
-          {pinServiceable === true && (
+          {pinReady && pin?.serviceable && (
             <p className="text-success mt-0 mb-2 text-[13px] font-semibold">
-              Great – we deliver to {form.pincode}.
+              Great – we deliver to {pin.areaName ?? form.pincode}.
+            </p>
+          )}
+          {saveError && (
+            <p role="alert" className="text-danger mt-0 mb-2 text-[13px] font-semibold">
+              {saveError}
             </p>
           )}
           <button type="submit" hidden aria-hidden="true" tabIndex={-1} />

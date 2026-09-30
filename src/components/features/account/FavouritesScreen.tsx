@@ -1,24 +1,24 @@
 'use client';
 
+import useSWR from 'swr';
 import { useCatalogue } from '@/components/features/CatalogueProvider';
 import { ProductRow } from '@/components/features/ProductCards';
 import { ButtonLink } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { LoadingRegion, ProductRowSkeleton } from '@/components/ui/Skeleton';
-import { useAccountStore } from '@/lib/stores/account';
-import { useHydrated } from '@/lib/stores/ui';
+import { fetcher } from '@/lib/client/api';
 
 export function FavouritesScreen() {
-  const hydrated = useHydrated();
   const { products } = useCatalogue();
-  const favourites = useAccountStore((s) => s.favourites);
-  const list = products.filter((p) => favourites.includes(p.id));
+  const { data, isLoading } = useSWR<{ productIds: string[] }>('/api/favorites', fetcher);
+  const ids = data?.productIds ?? [];
+  const list = ids.map((id) => products.find((p) => p.id === id)).filter((p) => p !== undefined);
 
   return (
     <main className="pb-10">
       <PageHeader title="Favourites" backHref="/account" backLabel="Back to account" />
-      {!hydrated ? (
+      {isLoading && !data ? (
         <LoadingRegion label="Loading favourites">
           <ProductRowSkeleton />
           <ProductRowSkeleton />

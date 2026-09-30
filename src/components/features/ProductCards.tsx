@@ -36,6 +36,9 @@ export function ProductCard({ product }: { product: ProductDTO }) {
         <ProductImage
           slug={product.slug}
           categorySlug={product.categorySlug}
+          imageUrl={product.imageUrl}
+          sizes="148px"
+          priority
           className="h-[116px] w-full rounded-2xl"
         />
         <span className="mx-1.5 mt-3 mr-[52px] block font-serif text-[17px] font-semibold tracking-[-0.2px]">
@@ -62,6 +65,8 @@ export function ProductRow({ product }: { product: ProductDTO }) {
         <ProductImage
           slug={product.slug}
           categorySlug={product.categorySlug}
+          imageUrl={product.imageUrl}
+          sizes="76px"
           className={cn('size-[76px] rounded-[18px]', soldOut && 'opacity-50 grayscale')}
         />
         <span className="flex min-w-0 flex-col gap-0.5">

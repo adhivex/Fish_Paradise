@@ -267,6 +267,8 @@ model Order {
   slotType        SlotType
   slotStart       DateTime?
   slotEnd         DateTime?
+  slotTemplateId  String? // scheduled slot template (capacity counting)
+  slotLabel       String? // display snapshot, e.g. "Today, 5:00 – 6:00 PM"
   etaMinMinutes   Int?
   etaMaxMinutes   Int?
   subtotalPaise   Int
@@ -287,6 +289,7 @@ model Order {
   events  OrderEvent[]
   payments Payment[]
   couponUse CouponUse?
+  notifications NotificationLog[]
 
   @@index([userId, placedAt])
   @@index([status, placedAt])
@@ -370,4 +373,36 @@ model ShopSettings {
   unpaidCancelMinutes    Int     @default(30)
   priceBandsPaise        Json? // e.g. [30000, 60000]
   deliveryCity           String? // shown as "Deliver to <city>" on Home
+}
+
+// Sliding-window rate limiting (OTP requests per phone / IP, etc.)
+model RateLimitHit {
+  id        String   @id @default(cuid())
+  key       String // e.g. "otp:phone:+9198..." or "otp:ip:1.2.3.4"
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+}
+
+enum NotificationStatus {
+  SENT
+  FAILED
+  SKIPPED
+}
+
+// Every customer/owner notification attempt (never blocks the order flow)
+model NotificationLog {
+  id        String             @id @default(cuid())
+  orderId   String?
+  channel   String // console | whatsapp | sms
+  template  String // order_confirmed, out_for_delivery, ...
+  recipient String
+  status    NotificationStatus
+  error     String?
+  createdAt DateTime           @default(now())
+
+  order Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([createdAt])
 }

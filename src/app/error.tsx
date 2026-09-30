@@ -16,7 +16,7 @@ export default function RouteError({
   }, [error]);
 
   return (
-    <main className="pt-10 pb-10" role="alert">
+    <main className="bg-cream mx-auto min-h-dvh max-w-[480px] pt-10 pb-10" role="alert">
       <EmptyState
         icon="alert"
         title="Something went wrong"

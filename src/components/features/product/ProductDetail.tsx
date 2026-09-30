@@ -14,23 +14,25 @@ import { QuantityStepper } from '@/components/ui/QuantityStepper';
 import { formatMoney } from '@/lib/money';
 import { lineTotalPaise } from '@/lib/pricing';
 import { clampQty, maxAllowedGrams, stepQty } from '@/lib/qty';
-import { useAccountStore } from '@/lib/stores/account';
+import { useFavourites } from '@/lib/client/data';
 import { useCartStore } from '@/lib/stores/cart';
-import { useHydrated } from '@/lib/stores/ui';
 import type { ProductDTO } from '@/lib/types';
 
 const DEFAULT_GRAMS = 1000;
 
 export function ProductDetail({ product }: { product: ProductDTO }) {
   const router = useRouter();
-  const hydrated = useHydrated();
   const { cleaningOptions, defaultCleaning, shop } = useCatalogue();
   const [grams, setGrams] = useState(() => clampQty(DEFAULT_GRAMS, product));
   const [cleaningId, setCleaningId] = useState(defaultCleaning?.id ?? '');
   const [customNote, setCustomNote] = useState('');
   const add = useCartStore((s) => s.add);
-  const isFav = useAccountStore((s) => s.favourites.includes(product.id));
-  const toggleFav = useAccountStore((s) => s.toggleFavourite);
+  const favourites = useFavourites();
+  const isFav = favourites.ids.includes(product.id);
+  const toggleFav = () => {
+    if (favourites.loggedIn) void favourites.toggle(product.id).catch(() => {});
+    else router.push(`/login?next=/product/${product.slug}`);
+  };
 
   const soldOut = !product.todayAvailable || maxAllowedGrams(product) === 0;
   const cleaning = cleaningOptions.find((o) => o.id === cleaningId);
@@ -39,13 +41,15 @@ export function ProductDetail({ product }: { product: ProductDTO }) {
 
   function addToCart() {
     if (soldOut || needsNote || !cleaning) return;
-    add({ productId: product.id, qtyGrams: grams, cleaningOptionId: cleaning.id }, product);
-    if (cleaning?.requiresNote) {
-      // Line notes join the order instructions until per-line notes arrive with the server cart.
-      const notes = useCartStore.getState().notes;
-      const line = `${product.name}: ${customNote.trim()}`;
-      useCartStore.getState().setNotes(notes ? `${notes}\n${line}` : line);
-    }
+    add(
+      {
+        productId: product.id,
+        qtyGrams: grams,
+        cleaningOptionId: cleaning.id,
+        lineNote: cleaning.requiresNote ? customNote.trim() : null,
+      },
+      product,
+    );
     router.push('/cart');
   }
 
@@ -55,6 +59,9 @@ export function ProductDetail({ product }: { product: ProductDTO }) {
         <ProductImage
           slug={product.slug}
           categorySlug={product.categorySlug}
+          imageUrl={product.imageUrl}
+          sizes="(max-width: 480px) 100vw, 480px"
+          priority
           className="absolute inset-0"
           glyphClassName="w-[74%]"
           eyeColor="#fff"
@@ -69,11 +76,11 @@ export function ProductDetail({ product }: { product: ProductDTO }) {
         <IconButton
           icon="heart"
           label={isFav ? `Remove ${product.name} from favourites` : `Save ${product.name} to favourites`}
-          aria-pressed={hydrated ? isFav : false}
+          aria-pressed={isFav}
           tone="cream"
-          filled={hydrated && isFav}
-          onClick={() => toggleFav(product.id)}
-          className={`absolute top-3.5 right-3 ${hydrated && isFav ? 'text-gold-glyph!' : ''}`}
+          filled={isFav}
+          onClick={toggleFav}
+          className={`absolute top-3.5 right-3 ${isFav ? 'text-gold-glyph!' : ''}`}
         />
       </div>
 

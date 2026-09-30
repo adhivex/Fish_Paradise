@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import type { OrderStatus } from '@/lib/types';
-import { buildTimeline, matchesOrderFilter, orderGroup, orderNumberFromSeq } from './orders';
+import {
+  buildTimeline,
+  canTransition,
+  customerCanCancel,
+  matchesOrderFilter,
+  nextStatus,
+  orderGroup,
+  orderNumberFromSeq,
+  statusesForFilter,
+} from './orders';
 
 const states = (status: OrderStatus) =>
   buildTimeline({ status, placedAt: 0, events: [] }).map((s) => s.state);
@@ -27,7 +36,7 @@ describe('buildTimeline', () => {
     const steps = buildTimeline({
       status: 'CONFIRMED',
       placedAt: 1_000,
-      events: [{ status: 'CONFIRMED', at: 5_000 }],
+      events: [{ status: 'CONFIRMED', at: 5_000, note: null }],
     });
     expect(steps[0]).toMatchObject({ at: 5_000, estimated: false });
     expect(steps[2]).toMatchObject({ at: 1_000 + 35 * 60_000, estimated: true });
@@ -51,5 +60,42 @@ describe('order groups', () => {
 describe('orderNumberFromSeq', () => {
   it('follows FP + (1000 + seq)', () => {
     expect(orderNumberFromSeq(24)).toBe('FP1024');
+  });
+});
+
+describe('status transitions', () => {
+  it('follows the documented flow', () => {
+    expect(canTransition('PLACED', 'CONFIRMED')).toBe(true);
+    expect(canTransition('CONFIRMED', 'CLEANING_PACKING')).toBe(true);
+    expect(canTransition('CLEANING_PACKING', 'OUT_FOR_DELIVERY')).toBe(true);
+    expect(canTransition('OUT_FOR_DELIVERY', 'DELIVERED')).toBe(true);
+  });
+
+  it('forbids skipping, going back and leaving final states', () => {
+    expect(canTransition('PLACED', 'DELIVERED')).toBe(false);
+    expect(canTransition('OUT_FOR_DELIVERY', 'CONFIRMED')).toBe(false);
+    expect(canTransition('DELIVERED', 'CANCELLED')).toBe(false);
+    expect(canTransition('CANCELLED', 'CONFIRMED')).toBe(false);
+  });
+
+  it('allows cancellation only before the order is out for delivery', () => {
+    expect(canTransition('CLEANING_PACKING', 'CANCELLED')).toBe(true);
+    expect(canTransition('OUT_FOR_DELIVERY', 'CANCELLED')).toBe(false);
+  });
+
+  it('lets customers cancel only before cleaning starts', () => {
+    expect(customerCanCancel('PLACED')).toBe(true);
+    expect(customerCanCancel('CONFIRMED')).toBe(true);
+    expect(customerCanCancel('CLEANING_PACKING')).toBe(false);
+  });
+
+  it('knows the next forward step', () => {
+    expect(nextStatus('CONFIRMED')).toBe('CLEANING_PACKING');
+    expect(nextStatus('DELIVERED')).toBeNull();
+  });
+
+  it('maps chips to statuses', () => {
+    expect(statusesForFilter('Preparing')).toEqual(['PLACED', 'CONFIRMED', 'CLEANING_PACKING']);
+    expect(statusesForFilter('All')).toBeNull();
   });
 });

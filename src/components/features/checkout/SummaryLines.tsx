@@ -7,6 +7,7 @@ interface SummaryLine {
   key: string;
   slug: string;
   categorySlug?: string;
+  imageUrl?: string | null;
   name: string;
   qtyGrams: number;
   cleaningLabel: string;
@@ -37,6 +38,8 @@ export function SummaryLines({
           <ProductImage
             slug={l.slug}
             categorySlug={l.categorySlug}
+            imageUrl={l.imageUrl}
+            sizes="56px"
             className={tile === 'sm' ? 'size-11 rounded-xl' : 'size-14 rounded-[14px]'}
           />
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">

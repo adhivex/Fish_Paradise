@@ -90,3 +90,50 @@ export function statusHeadline(status: OrderStatus): { headline: string; subline
 export function orderNumberFromSeq(seq: number): string {
   return `FP${1000 + seq}`;
 }
+
+/** Allowed status transitions (docs/DATA_MODEL.md). */
+const TRANSITIONS: Record<OrderStatus, readonly OrderStatus[]> = {
+  PLACED: ['CONFIRMED', 'CANCELLED'],
+  CONFIRMED: ['CLEANING_PACKING', 'CANCELLED'],
+  CLEANING_PACKING: ['OUT_FOR_DELIVERY', 'CANCELLED'],
+  OUT_FOR_DELIVERY: ['DELIVERED'],
+  DELIVERED: [],
+  CANCELLED: [],
+};
+
+export function canTransition(from: OrderStatus, to: OrderStatus): boolean {
+  return TRANSITIONS[from].includes(to);
+}
+
+/** Next forward step for the admin "advance" button, if any. */
+export function nextStatus(from: OrderStatus): OrderStatus | null {
+  return TRANSITIONS[from].find((s) => s !== 'CANCELLED') ?? null;
+}
+
+/** Customers may cancel until cleaning starts; the shop until the order leaves (PRD §5). */
+export function customerCanCancel(status: OrderStatus): boolean {
+  return status === 'PLACED' || status === 'CONFIRMED';
+}
+
+export const STATUS_LABEL: Record<OrderStatus, string> = {
+  PLACED: 'Placed',
+  CONFIRMED: 'Confirmed',
+  CLEANING_PACKING: 'Cleaning & packing',
+  OUT_FOR_DELIVERY: 'Out for delivery',
+  DELIVERED: 'Delivered',
+  CANCELLED: 'Cancelled',
+};
+
+/** Maps a customer status chip to the statuses it covers (for `GET /api/orders?status=`). */
+export function statusesForFilter(filter: OrderFilter): OrderStatus[] | null {
+  switch (filter) {
+    case 'Preparing':
+      return ['PLACED', 'CONFIRMED', 'CLEANING_PACKING'];
+    case 'Out for delivery':
+      return ['OUT_FOR_DELIVERY'];
+    case 'Delivered':
+      return ['DELIVERED'];
+    default:
+      return null;
+  }
+}

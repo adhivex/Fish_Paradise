@@ -95,26 +95,31 @@ export type OrderStatus =
 
 export type PaymentMethod = 'UPI' | 'CARD' | 'NETBANKING' | 'COD';
 
-export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'COD_PENDING' | 'COD_COLLECTED';
+export type PaymentStatus =
+  'PENDING' | 'PAID' | 'FAILED' | 'REFUND_PENDING' | 'REFUNDED' | 'COD_PENDING' | 'COD_COLLECTED';
 
 export type SlotChoice = { type: 'ASAP' } | { type: 'SCHEDULED'; templateId: string; date: string };
 
 export interface OrderItemDTO {
   productId: string;
   productSlug: string;
+  productImageUrl: string | null;
   nameSnapshot: string;
   pricePerKgPaise: number;
   qtyGrams: number;
   cleaningLabel: string;
+  lineNote: string | null;
   lineTotalPaise: number;
 }
 
 export interface OrderEventDTO {
   status: OrderStatus;
   at: number; // epoch ms
+  note: string | null;
 }
 
 export interface OrderDTO {
+  id: string;
   orderNumber: string;
   status: OrderStatus;
   placedAt: number;
@@ -129,5 +134,9 @@ export interface OrderDTO {
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
   notes: string | null;
+  cancelReason: string | null;
+  etaMinMinutes: number | null;
+  etaMaxMinutes: number | null;
   events: OrderEventDTO[];
+  canCancel: boolean;
 }

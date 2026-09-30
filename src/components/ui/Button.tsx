@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { ButtonHTMLAttributes, ComponentProps } from 'react';
 import { cn } from '@/lib/cn';
 
-type Variant = 'primary' | 'outline' | 'gold';
+type Variant = 'primary' | 'outline' | 'gold' | 'danger' | 'dangerOutline';
 type Size = 'lg' | 'md';
 
 interface StyleProps {
@@ -16,6 +16,8 @@ const VARIANTS: Record<Variant, string> = {
   outline:
     'border border-ink bg-transparent text-ink hover:bg-ink/5 disabled:opacity-50 disabled:hover:bg-transparent',
   gold: 'bg-gold text-ink hover:bg-[#d3b06a]',
+  danger: 'bg-danger text-white hover:bg-[#9a2f16] disabled:opacity-50',
+  dangerOutline: 'border border-danger bg-transparent text-danger hover:bg-danger/5 disabled:opacity-50',
 };
 
 const SIZES: Record<Size, string> = {

@@ -1,5 +1,5 @@
 import { cn } from '@/lib/cn';
-import { formatTime } from '@/lib/datetime';
+import { formatIstTime as formatTime } from '@/lib/ist';
 import type { TimelineStep } from '@/lib/orders';
 import { Icon } from './Icon';
 

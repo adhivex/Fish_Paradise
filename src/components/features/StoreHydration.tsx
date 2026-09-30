@@ -1,9 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useAccountStore } from '@/lib/stores/account';
 import { useCartStore } from '@/lib/stores/cart';
-import { useOrdersStore } from '@/lib/stores/orders';
+import { useCheckoutStore } from '@/lib/stores/checkout';
 import { useUiStore } from '@/lib/stores/ui';
 
 /**
@@ -12,11 +11,9 @@ import { useUiStore } from '@/lib/stores/ui';
  */
 export function StoreHydration() {
   useEffect(() => {
-    void Promise.all([
-      useCartStore.persist.rehydrate(),
-      useAccountStore.persist.rehydrate(),
-      useOrdersStore.persist.rehydrate(),
-    ]).finally(() => useUiStore.getState().setHydrated());
+    void Promise.all([useCartStore.persist.rehydrate(), useCheckoutStore.persist.rehydrate()]).finally(() =>
+      useUiStore.getState().setHydrated(),
+    );
   }, []);
   return null;
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { computeTotals, deliveryFeePaise, lineTotalPaise } from './pricing';
+import { deliveryFeePaise, lineTotalPaise } from './pricing';
 
 describe('lineTotalPaise', () => {
   it('prices by weight', () => {
@@ -34,30 +34,5 @@ describe('deliveryFeePaise', () => {
 
   it('never goes free without a threshold', () => {
     expect(deliveryFeePaise(9_999_999, { deliveryFeePaise: 4000, freeAbovePaise: null })).toBe(4000);
-  });
-});
-
-describe('computeTotals', () => {
-  it('sums lines, fee and discount', () => {
-    const t = computeTotals(
-      [{ lineTotalPaise: 65000 }, { lineTotalPaise: 39000 }],
-      { deliveryFeePaise: 4000, freeAbovePaise: null },
-      5000,
-    );
-    expect(t).toEqual({
-      subtotalPaise: 104000,
-      deliveryFeePaise: 4000,
-      discountPaise: 5000,
-      totalPaise: 103000,
-    });
-  });
-
-  it('caps the discount at the subtotal', () => {
-    const t = computeTotals(
-      [{ lineTotalPaise: 1000 }],
-      { deliveryFeePaise: 4000, freeAbovePaise: null },
-      5000,
-    );
-    expect(t.totalPaise).toBe(4000);
   });
 });

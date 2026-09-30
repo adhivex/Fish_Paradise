@@ -3,7 +3,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 
 export default function NotFound() {
   return (
-    <main className="pt-10 pb-10">
+    <main className="bg-cream mx-auto min-h-dvh max-w-[480px] pt-10 pb-10">
       <EmptyState
         icon="fish"
         title="This one got away"
