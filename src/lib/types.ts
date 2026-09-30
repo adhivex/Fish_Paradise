@@ -66,7 +66,15 @@ export interface ShopSettingsDTO {
   asapMaxMinutes: number;
   autoConfirmCod: boolean;
   priceBandsPaise: number[];
-  cityLabel: string;
+  deliveryCity: string | null;
+}
+
+/** Everything the storefront needs to render: returned by the cached catalogue service. */
+export interface CatalogueDTO {
+  categories: CategoryDTO[];
+  products: ProductDTO[];
+  cleaningOptions: CleaningOptionDTO[];
+  shop: ShopSettingsDTO;
 }
 
 export interface AddressDTO {

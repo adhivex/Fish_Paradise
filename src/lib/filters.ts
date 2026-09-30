@@ -97,3 +97,14 @@ export function activeFilterCount(filter: ProductFilter): number {
     (filter.category !== 'all' ? 1 : 0)
   );
 }
+
+/** Shop URL for a filter; defaults are omitted so shared links stay short. */
+export function filterToHref(filter: ProductFilter): string {
+  const params = new URLSearchParams();
+  if (filter.category !== 'all') params.set('category', filter.category);
+  if (filter.query.trim()) params.set('q', filter.query.trim());
+  if (filter.sort !== 'rec') params.set('sort', filter.sort);
+  if (filter.priceBand !== 'any') params.set('priceBand', filter.priceBand);
+  const qs = params.toString();
+  return qs ? `/shop?${qs}` : '/shop';
+}

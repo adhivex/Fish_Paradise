@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { products } from '@/lib/mock/catalogue';
-import { activeFilterCount, buildPriceBands, DEFAULT_FILTER, filterProducts } from './filters';
+import { fixtureCatalogue } from '@/test/fixtures';
+import { activeFilterCount, buildPriceBands, DEFAULT_FILTER, filterProducts, filterToHref } from './filters';
 
+const { products } = fixtureCatalogue();
 const bands = buildPriceBands([30000, 60000]);
 const names = (f: Partial<typeof DEFAULT_FILTER>) =>
   filterProducts(products, { ...DEFAULT_FILTER, ...f }, bands).map((p) => p.slug);
@@ -56,5 +57,17 @@ describe('activeFilterCount', () => {
   it('counts non-default sheet filters', () => {
     expect(activeFilterCount(DEFAULT_FILTER)).toBe(0);
     expect(activeFilterCount({ ...DEFAULT_FILTER, sort: 'low', category: 'crab', query: 'x' })).toBe(2);
+  });
+});
+
+describe('filterToHref', () => {
+  it('omits defaults', () => {
+    expect(filterToHref(DEFAULT_FILTER)).toBe('/shop');
+  });
+
+  it('encodes every non-default filter', () => {
+    expect(filterToHref({ category: 'fish', query: ' rohu ', sort: 'low', priceBand: 'b1' })).toBe(
+      '/shop?category=fish&q=rohu&sort=low&priceBand=b1',
+    );
   });
 });
