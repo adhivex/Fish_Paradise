@@ -7,10 +7,20 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: fish
+          POSTGRES_PASSWORD: fish
+          POSTGRES_DB: fishparadise
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U fish" --health-interval 5s --health-timeout 5s --health-retries 10
     env:
-      # Prisma generate needs a syntactically valid URL; no DB is contacted in CI.
-      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
-      DIRECT_URL: postgresql://ci:ci@localhost:5432/ci
+      # CI uses a throwaway Postgres; production uses Supabase (see README).
+      DATABASE_URL: postgresql://fish:fish@localhost:5432/fishparadise
+      DIRECT_URL: postgresql://fish:fish@localhost:5432/fishparadise
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -22,4 +32,8 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
+      - run: pnpm prisma migrate deploy
+      - run: pnpm db:seed
+      - run: pnpm exec vitest run --config vitest.integration.config.mts
+      # Pages are prerendered from the catalogue, so the build needs the seeded database.
       - run: pnpm build

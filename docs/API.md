@@ -5,13 +5,13 @@ Validate every body/query with Zod. Money in paise, weights in grams. Auth = ses
 
 ## Public
 
-| Method & path                                      | Purpose                                                                         |
-| -------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `GET /api/catalogue?category=&q=&sort=&priceBand=` | Products with today's price/availability, categories, cleaning options          |
-| `GET /api/products/:slug`                          | Product detail                                                                  |
-| `GET /api/shop`                                    | Public shop settings (name, phone, hours, accepting orders, FSSAI, price bands) |
-| `GET /api/delivery/check?pincode=`                 | `{ serviceable, feePaise, freeAbovePaise, minOrderPaise }`                      |
-| `GET /api/slots?date=`                             | Available scheduled slots with remaining capacity, plus ASAP availability       |
+| Method & path                                      | Purpose                                                                                            |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `GET /api/catalogue?category=&q=&sort=&priceBand=` | Products with today's price/availability, categories, cleaning options, price bands. `sort` = `rec | low | high | az`; `priceBand`=`any`or`b0`…`bN`from`ShopSettings.priceBandsPaise`. Unknown category/band fall back to all/any; the applied `filter` is echoed back |
+| `GET /api/products/:slug`                          | Product detail                                                                                     |
+| `GET /api/shop`                                    | Public shop settings (name, phone, hours, accepting orders, FSSAI, price bands)                    |
+| `GET /api/delivery/check?pincode=`                 | `{ serviceable, feePaise, freeAbovePaise, minOrderPaise }`                                         |
+| `GET /api/slots?date=`                             | Available scheduled slots with remaining capacity, plus ASAP availability                          |
 
 ## Auth
 

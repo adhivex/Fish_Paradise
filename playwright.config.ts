@@ -1,10 +1,16 @@
 import { defineConfig, devices } from '@playwright/test';
 
+// A dedicated port so e2e never reuses some other app running on 3000.
+const PORT = Number(process.env.E2E_PORT ?? 3100);
+const baseURL = `http://localhost:${PORT}`;
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
   retries: process.env.CI ? 2 : 0,
-  use: { baseURL: 'http://localhost:3000', trace: 'on-first-retry' },
+  // The dev server compiles each route on first visit, which can take several seconds.
+  expect: { timeout: 20_000 },
+  use: { baseURL, trace: 'on-first-retry' },
   projects: [
     {
       name: 'mobile',
@@ -17,8 +23,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm dev',
-    url: 'http://localhost:3000',
+    command: `pnpm dev --port ${PORT}`,
+    url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },

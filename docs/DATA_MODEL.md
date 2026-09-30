@@ -16,7 +16,7 @@ Schema: `prisma/schema.prisma`. Money = integer paise, weight = integer grams.
 - **Coupon / CouponUse** – percent or flat; validity; global and per-user limits; `usedCount` incremented in the same transaction as order creation.
 - **Order / OrderItem / OrderEvent / Payment** – see below.
 - **WebhookEvent** – idempotency log for Razorpay webhooks (`@@unique [provider, eventId]`).
-- **ShopSettings** – singleton row `id = "shop"`.
+- **ShopSettings** – singleton row `id = "shop"`. `priceBandsPaise` drives the Shop price filter; `deliveryCity` is shown as "Deliver to …" on Home.
 
 ## Order creation (single transaction)
 
@@ -43,4 +43,4 @@ Quantities: `< 1000 g → "500 g"`, otherwise kg with up to one decimal (`1 kg`,
 
 ## Indexes & performance
 
-Indexes exist on order lists (`userId, placedAt`; `status, placedAt`), product listing (`categoryId, isActive`) and price history. Cache the public catalogue (ISR / `revalidateTag('catalogue')`) and revalidate when admin updates prices or availability.
+Indexes exist on order lists (`userId, placedAt`; `status, placedAt`), product listing (`categoryId, isActive`) and price history. Cache the public catalogue (ISR / `revalidateTag('catalogue', 'max')`) and revalidate when admin updates prices or availability. Implemented in `src/server/services/catalogue.ts` (`unstable_cache`, tag `catalogue`, 60 s fallback).

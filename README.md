@@ -9,12 +9,13 @@ Supabase Postgres + Prisma 6 · Zod · Vitest · Playwright · pnpm.
 
 ## Status
 
-| Phase | Scope                                                    | State |
-| ----- | -------------------------------------------------------- | ----- |
-| 0     | Scaffold, tooling, CI, design tokens, Prisma             | Done  |
-| 1     | Design system + all customer screens with mock data      | Done  |
-| 2     | Database & catalogue API (Supabase)                      | Next  |
-| 3–10  | Auth, server cart, orders & payments, admin, PWA, launch | –     |
+| Phase | Scope                                               | State |
+| ----- | --------------------------------------------------- | ----- |
+| 0     | Scaffold, tooling, CI, design tokens, Prisma        | Done  |
+| 1     | Design system + all customer screens with mock data | Done  |
+| 2     | Database & catalogue API (Supabase)                 | Done  |
+| 3     | Phone + OTP authentication                          | Next  |
+| 4–10  | Server cart, orders & payments, admin, PWA, launch  | –     |
 
 See `docs/BUILD_PLAN.md`.
 
@@ -22,24 +23,31 @@ See `docs/BUILD_PLAN.md`.
 
 Requirements: Node 20+ and pnpm 9 (`npm i -g pnpm@9`).
 
+1. Set up the database (next section) so `.env` has `DATABASE_URL` and `DIRECT_URL`.
+2. Install, migrate, seed and start:
+
 ```bash
 pnpm install
+pnpm db:migrate
+pnpm db:seed
 pnpm dev
 ```
 
-Open http://localhost:3000 and use the browser's device toolbar at 390px width. Phase 1 runs entirely on
-an in-memory mock catalogue (`src/lib/mock/catalogue.ts`, mirrors `prisma/seed.ts`); cart, orders,
-favourites and addresses are stored in `localStorage` (clear site data to reset).
+Open http://localhost:3000 and use the browser's device toolbar at 390px width. Products, prices,
+availability, categories, cleaning options and shop settings come from the database (cached for up to
+a minute under the `catalogue` tag). Cart, orders, favourites and addresses are still client-side mocks
+in `localStorage` until Phases 3–5 (clear site data to reset).
 
 ### Checks
 
 ```bash
-pnpm lint && pnpm typecheck && pnpm test   # unit tests (Vitest)
+pnpm lint && pnpm typecheck && pnpm test   # unit + route-handler tests (Vitest, no DB needed)
+pnpm test:integration                      # catalogue service against the DB in .env
 pnpm e2e                                   # Playwright; PW_CHANNEL=msedge pnpm e2e to use installed Edge
 pnpm build
 ```
 
-## Database (Supabase) – needed from Phase 2
+## Database (Supabase)
 
 1. Create a Supabase project (region close to your customers, e.g. Mumbai `ap-south-1`).
 2. **Project Settings → Database → Connection string**:

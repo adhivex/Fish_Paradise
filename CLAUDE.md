@@ -21,7 +21,7 @@ The approved UI reference is `design/prototype/Main.dc.html` (reference only, do
 
 - `pnpm dev` – dev server
 - `pnpm db:up` – optional local Postgres (docker compose) · `pnpm db:migrate` · `pnpm db:seed` · `pnpm db:studio`
-- `pnpm lint` · `pnpm typecheck` · `pnpm test` · `pnpm e2e` · `pnpm build`
+- `pnpm lint` · `pnpm typecheck` · `pnpm test` · `pnpm test:integration` (needs DB) · `pnpm e2e` · `pnpm build`
 
 ## Non-negotiable rules
 
