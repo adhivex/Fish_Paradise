@@ -369,4 +369,5 @@ model ShopSettings {
   autoConfirmCod         Boolean @default(true)
   unpaidCancelMinutes    Int     @default(30)
   priceBandsPaise        Json? // e.g. [30000, 60000]
+  deliveryCity           String? // shown as "Deliver to <city>" on Home
 }
